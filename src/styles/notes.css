@@ -223,13 +223,6 @@
 .editor-save.muted {
   color: var(--ink-3);
 }
-.editor-top .btn-icon.active {
-  background: rgba(242, 181, 86, 0.14);
-  color: var(--warn);
-}
-.editor-top .btn-icon.active .icon-star {
-  color: var(--warn);
-}
 .editor-grid {
   display: grid;
   grid-template-columns: 1fr 260px;

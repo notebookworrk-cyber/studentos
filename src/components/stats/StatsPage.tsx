@@ -9,8 +9,8 @@ const RANKS = [
   { min: 5, title: "Learner", color: "var(--cyan)" },
   { min: 10, title: "Scholar", color: "var(--accent)" },
   { min: 20, title: "Adept", color: "var(--accent-2)" },
-  { min: 35, title: "Expert", color: "var(--green)" },
-  { min: 50, title: "Master", color: "var(--amber)" },
+  { min: 35, title: "Expert", color: "var(--good)" },
+  { min: 50, title: "Master", color: "var(--warn)" },
   { min: 75, title: "Sage", color: "var(--danger)" },
 ];
 
@@ -122,6 +122,7 @@ export function StatsPage() {
   }, [wxp]);
 
   const xpDelta = currentWeekXP - prevWeekXP;
+  const isFresh = gamification.xp === 0 && Object.keys(wxp).length === 0;
 
   const dayMap = useMemo(() => {
     const now = new Date();
@@ -193,9 +194,11 @@ export function StatsPage() {
 
   return (
     <div className="page stats-page">
-      <header className="stats-head">
-        <h1>Stats</h1>
-        <p className="stats-subtitle">Your progress and achievements</p>
+      <header className="page-head">
+        <div>
+          <h1 className="page-title">Stats</h1>
+          <p className="page-subtitle">Your progress and achievements</p>
+        </div>
       </header>
 
       <div className="stats-hero glass">
@@ -218,47 +221,57 @@ export function StatsPage() {
         </div>
       </div>
 
-      <div className="stats-grid">
-        {stats.map((s) => (
-          <div key={s.label} className="stats-card glass">
-            <Icon name={s.icon} size={18} />
-            <div className="stats-card-value">{s.value}</div>
-            <div className="stats-card-label">{s.label}</div>
-          </div>
-        ))}
-        {xpDelta !== 0 && (
-          <div className={`stats-card glass stats-card-delta ${xpDelta > 0 ? "positive" : "negative"}`}>
-            <Icon name="chart" size={18} />
-            <div className="stats-card-value">{xpDelta > 0 ? "+" : ""}{xpDelta}</div>
-            <div className="stats-card-label">XP this week vs last</div>
-          </div>
-        )}
-      </div>
-
-      <div className="stats-chart-section glass">
-        <div className="stats-chart-head">
-          <h2>{chartLabel}</h2>
-          <div className="stats-range-tabs" role="tablist">
-            {(["week", "month", "all"] as Range[]).map((r) => (
-              <button key={r} className={`stats-range-tab ${range === r ? "active" : ""}`} role="tab" aria-selected={range === r} onClick={() => setRange(r)}>
-                {r === "week" ? "7d" : r === "month" ? "30d" : "All"}
-              </button>
-            ))}
-          </div>
+      {isFresh ? (
+        <div className="stats-empty glass">
+          <Icon name="chart" size={28} />
+          <h2>No activity yet</h2>
+          <p>Complete tasks, study and lock in to start building your XP.</p>
         </div>
-        <div className="stats-chart">
-          {chartDays.map((d, i) => (
-            <div key={i} className="stats-chart-col">
-              <div className="stats-chart-bar-wrap">
-                <div className="stats-chart-bar" style={{ transform: `scaleY(${(d.xp / maxXP)})` }} />
+      ) : (
+        <>
+          <div className="stats-grid">
+            {stats.map((s) => (
+              <div key={s.label} className="stats-card glass">
+                <Icon name={s.icon} size={18} />
+                <div className="stats-card-value">{s.value}</div>
+                <div className="stats-card-label">{s.label}</div>
               </div>
-              {d.label && <div className="stats-chart-label">{d.label}</div>}
-              {d.xp > 0 && d.label && <div className="stats-chart-xp">{d.xp}</div>}
+            ))}
+            {xpDelta !== 0 && (
+              <div className={`stats-card glass stats-card-delta ${xpDelta > 0 ? "positive" : "negative"}`}>
+                <Icon name="chart" size={18} />
+                <div className="stats-card-value">{xpDelta > 0 ? "+" : ""}{xpDelta}</div>
+                <div className="stats-card-label">XP this week vs last</div>
+              </div>
+            )}
+          </div>
+
+          <div className="stats-chart-section glass">
+            <div className="stats-chart-head">
+              <h2>{chartLabel}</h2>
+              <div className="stats-range-tabs" role="tablist">
+                {(["week", "month", "all"] as Range[]).map((r) => (
+                  <button key={r} className={`stats-range-tab ${range === r ? "active" : ""}`} role="tab" aria-selected={range === r} onClick={() => setRange(r)}>
+                    {r === "week" ? "7d" : r === "month" ? "30d" : "All"}
+                  </button>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="stats-chart-total">{totalXP.toLocaleString()} XP total</div>
-      </div>
+            <div className="stats-chart">
+              {chartDays.map((d, i) => (
+                <div key={i} className="stats-chart-col">
+                  <div className="stats-chart-bar-wrap">
+                    <div className="stats-chart-bar" style={{ transform: `scaleY(${(d.xp / maxXP)})` }} />
+                  </div>
+                  {d.label && <div className="stats-chart-label">{d.label}</div>}
+                  {d.xp > 0 && d.label && <div className="stats-chart-xp">{d.xp}</div>}
+                </div>
+              ))}
+            </div>
+            <div className="stats-chart-total">{totalXP.toLocaleString()} XP total</div>
+          </div>
+        </>
+      )}
 
       <div className="stats-focus glass">
         <div className="stats-focus-head">
@@ -341,7 +354,7 @@ export function StatsPage() {
                   const unlocked = (gamification.achievements ?? []).includes(a.id);
                   return (
                     <div key={a.id} className={`stats-achievement glass ${unlocked ? "unlocked" : ""}`} title={a.description}>
-                      <span className="stats-achievement-icon">{unlocked ? a.icon : "🔒"}</span>
+                      <span className="stats-achievement-icon">{unlocked ? a.icon : <Icon name="lock" size={24} />}</span>
                       <span className="stats-achievement-name">{a.name}</span>
                       <span className="stats-achievement-desc">{a.description}</span>
                     </div>

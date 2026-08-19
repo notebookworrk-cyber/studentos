@@ -14,7 +14,9 @@
   transition: border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
 .projects-card:hover {
-  border-color: rgba(154, 123, 255, 0.5);
+  border-color: var(--accent-soft-5);
+  transform: translateY(-2px);
+  box-shadow: var(--elev-1);
 }
 .projects-card.active {
   border-color: var(--accent);
@@ -38,11 +40,6 @@
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-}
-.projects-card-status {
-  font-size: 11px;
-  color: var(--ink-3);
-  margin-top: 6px;
 }
 .projects-card-nums {
   display: flex;

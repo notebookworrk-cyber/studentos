@@ -15,7 +15,7 @@ export interface MonthViewProps {
   onOpenComposer: (draft: { date: string; startTime?: string; duration?: number }) => void;
 }
 
-const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export default function MonthView({
@@ -44,8 +44,10 @@ export default function MonthView({
           return (
             <div
               key={iso}
+              tabIndex={0}
               className={`mv-cell ${isSelected ? "selected" : ""} ${isToday ? "today" : ""} heat-${heat}`}
               onClick={() => onSelectDate(iso)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelectDate(iso); } }}
               onContextMenu={(e) => { e.stopPropagation(); onOpenComposer({ date: iso, startTime: "09:00" }); }}
             >
               <span className="mv-daynum">{new Date(iso).getDate()}</span>

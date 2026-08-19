@@ -227,10 +227,8 @@ clock24h: boolean;
        setNotificationsEnabled: (b: boolean) => void;
        sessionReview: { kind: "study" | "lockin"; id: string } | null;
        openSessionReview: (kind: "study" | "lockin", id: string) => void;
-       submitSessionReview: (rating: number, note?: string) => void;
-       dismissSessionReview: () => void;
-      toasts: Array<{ id: string; message: string; type: "info" | "success" | "warning" | "error" }>;
-      showToast: (message: string, type?: "info" | "success" | "warning" | "error") => void;
+submitSessionReview: (rating: number, note?: string) => void;
+        dismissSessionReview: () => void;
   }
 
 const OSContext = createContext<OSContextValue | null>(null);
@@ -378,7 +376,6 @@ export function OSProvider({ children }: { children: ReactNode }) {
   const [clock24h, setClock24h] = useState<boolean>(() => loadState(CLOCK24H_KEY, true));
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => localStorage.getItem("studentos.notificationsEnabled.v1") !== "0");
   const [sessionReview, setSessionReview] = useState<{ kind: "study" | "lockin"; id: string } | null>(null);
-  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: "info" | "success" | "warning" | "error" }>>([]);
 
   useEffect(() => {
     localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
@@ -883,12 +880,6 @@ export function OSProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const showToast = (message: string, type: "info" | "success" | "warning" | "error" = "info") => {
-    const id = uid("toast");
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
-  };
-
   const openSessionReview = (kind: "study" | "lockin", id: string) => setSessionReview({ kind, id });
 
   const submitSessionReview = (rating: number, note?: string) => {
@@ -936,7 +927,6 @@ export function OSProvider({ children }: { children: ReactNode }) {
     setLocation(null);
     setClock24h(true);
     setNotificationsEnabled(true);
-    setToasts([]);
   };
 
   const applyWallpaper = (wp: string) => {
@@ -1131,8 +1121,6 @@ export function OSProvider({ children }: { children: ReactNode }) {
       openSessionReview,
       submitSessionReview,
       dismissSessionReview,
-      toasts,
-      showToast,
     };
 
   return <OSContext.Provider value={value}>{children}</OSContext.Provider>;

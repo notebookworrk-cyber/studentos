@@ -233,7 +233,7 @@ function TaskRow({ task, overdue, hasAI, breaking, onBreakDown, onMenu }: { task
       <div className="task-actions">
         {hasAI && onBreakDown && (
           <button
-            className="btn btn-ghost btn-icon"
+            className={`btn btn-ghost btn-icon ${breaking ? "is-loading" : ""}`}
             aria-label={`Break ${task.title} into subtasks`}
             title={breaking ? "Breaking down…" : "Break into subtasks (AI)"}
             onClick={() => onBreakDown(task)}

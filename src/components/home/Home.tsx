@@ -20,7 +20,6 @@ export function Home() {
     navigate,
     plan,
     overdue,
-    toasts,
   } = useOS();
 
   const taskCount = useMemo(() => plan.filter((p) => p.kind === "task").length, [plan]);
@@ -74,7 +73,6 @@ export function Home() {
           <AIEntry />
         </div>
       </div>
-      <ToastContainer toasts={toasts} />
     </div>
   );
 }
@@ -257,19 +255,6 @@ function QuickActions() {
   );
 }
 
-function ToastContainer({ toasts }: { toasts: Array<{ id: string; message: string; type: "info" | "success" | "warning" | "error" }> }) {
-  if (!toasts.length) return null;
-  return (
-    <div className="toast-container" role="region" aria-live="polite">
-      {toasts.map((t) => (
-        <div key={t.id} className={`toast toast-${t.type}`}>
-          <span className="toast-message">{t.message}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function GamificationCard() {
   const { gamification } = useOS();
   const { current, needed, pct } = xpProgressInLevel(gamification.xp);
@@ -282,7 +267,7 @@ function GamificationCard() {
         </div>
         <span className="home-gam-streak">{gamification.currentStreak} day streak</span>
       </div>
-      <div className="progress" style={{ marginTop: 8 }}>
+      <div className="progress">
         <div className="progress-track progress-mine" style={{ transform: `scaleX(${pct / 100})` }} />
       </div>
       <div className="home-gam-xp">{current} / {needed} XP</div>

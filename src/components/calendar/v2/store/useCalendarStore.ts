@@ -39,7 +39,7 @@ function inRange(date: string, start: string, end: string): boolean {
 export function useCalendarStore() {
   const {
     tasks, events, addEvent, updateEvent, deleteEvent, openComposer,
-    updateTask, deleteTask, togglePlan, startLockIn, showToast,
+    updateTask, deleteTask, togglePlan, startLockIn,
     today,
   } = useOS();
 
@@ -214,7 +214,7 @@ export function useCalendarStore() {
     matchesFilter,
     toMin,
     addEvent, updateEvent, deleteEvent, openComposer,
-    updateTask, deleteTask, togglePlan, startLockIn, showToast,
+    updateTask, deleteTask, togglePlan, startLockIn,
     tasks, events,
     moveSelected, goToToday,
   };

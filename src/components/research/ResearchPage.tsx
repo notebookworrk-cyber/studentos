@@ -88,7 +88,7 @@ export function ResearchPage() {
 
       <div className="research-layout">
         <aside className="study-rail research-rail">
-          <div className="study-rail-title">Sources</div>
+          <div className="rail-label">Sources</div>
           {sources.length === 0 ? (
             <p className="study-res-empty">No sources yet.</p>
           ) : (
@@ -107,13 +107,11 @@ export function ResearchPage() {
 
         <div className="research-main">
           {!active ? (
-            <section className="study-block surface">
-              <div className="empty-state">
-                <Icon name="research" size={28} />
-                <h3>No source selected</h3>
-                <p className="study-res-empty">Select a source, or add one to start annotating.</p>
-              </div>
-            </section>
+            <div className="empty-state">
+              <div className="empty-icon"><Icon name="research" size={24} /></div>
+              <h3 className="empty-title">No source selected</h3>
+              <p className="empty-line">Select a source, or add one to start annotating.</p>
+            </div>
           ) : (
             <SourceDetail
               source={active}

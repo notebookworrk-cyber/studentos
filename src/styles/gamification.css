@@ -1,9 +1,7 @@
 /* ── Gamification ── */
 
 /* Stats page */
-.stats-page { padding: var(--space-4) var(--space-5); max-width: 900px; }
-.stats-head h1 { font-size: var(--text-h1); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); }
-.stats-subtitle { font-size: var(--text-sm); color: var(--ink-3); margin-top: var(--space-1); }
+.stats-page { max-width: 900px; }
 
 /* Empty state */
 .stats-empty {
@@ -66,8 +64,8 @@
 .stats-card .icon { color: var(--accent); margin-bottom: var(--space-1); }
 .stats-card-value { font-size: var(--text-h2); font-weight: var(--weight-bold); }
 .stats-card-label { font-size: var(--text-caption); color: var(--ink-3); }
-.stats-card-delta.positive .stats-card-value { color: var(--green); }
-.stats-card-delta.positive .icon { color: var(--green); }
+.stats-card-delta.positive .stats-card-value { color: var(--good); }
+.stats-card-delta.positive .icon { color: var(--good); }
 .stats-card-delta.negative .stats-card-value { color: var(--danger); }
 .stats-card-delta.negative .icon { color: var(--danger); }
 
@@ -135,7 +133,6 @@
 
 /* Responsive */
 @media (max-width: 640px) {
-  .stats-page { padding: var(--space-3); }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-achievement-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-hero-top { flex-direction: column; align-items: flex-start; gap: var(--space-2); }

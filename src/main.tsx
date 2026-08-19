@@ -25,6 +25,7 @@ import "./styles/palette.css";
 import "./styles/notifications.css";
 import "./styles/gamification.css";
 import "./styles/extras.css";
+import "./styles/system.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

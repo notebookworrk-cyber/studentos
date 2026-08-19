@@ -105,7 +105,7 @@
 }
 .toolbar-select option,
 .input option {
-  background: #101a2e;
+  background: var(--panel-bg);
   color: var(--ink);
 }
 
@@ -156,7 +156,7 @@
 .task-check.on {
   background: var(--good);
   border-color: transparent;
-  color: #04160e;
+  color: var(--on-accent);
   animation: task-pop var(--t-med) var(--ease);
 }
 @keyframes task-pop {

@@ -86,7 +86,7 @@
   border-radius: 50%;
   background:
     radial-gradient(circle at center, rgba(18, 26, 46, 0.92) 0 58%, transparent 58.5%),
-    conic-gradient(#9a7bff var(--pct), var(--hover-bg-strong) var(--pct));
+    conic-gradient(var(--accent-2) var(--pct), var(--hover-bg-strong) var(--pct));
 }
 .lockin-time {
   position: absolute;

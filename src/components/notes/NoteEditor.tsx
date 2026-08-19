@@ -147,7 +147,7 @@ export function NoteEditor() {
           <Icon name="pin" size={16} />
         </button>
         <button
-          className={`btn btn-ghost btn-icon ${note.favorite ? "active" : ""}`}
+          className={`btn btn-ghost btn-icon ${note.favorite ? "active warn" : ""}`}
           aria-label={note.favorite ? "Unfavorite note" : "Favorite note"}
           onClick={() => updateNote(note.id, { favorite: !note.favorite })}
         >

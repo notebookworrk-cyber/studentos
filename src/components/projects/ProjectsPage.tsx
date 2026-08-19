@@ -66,9 +66,9 @@ export function ProjectsPage() {
 
       {projects.length === 0 ? (
         <div className="empty-state">
-          <Icon name="projects" size={28} />
-          <h3>No projects yet</h3>
-          <p className="study-res-empty">Create a project to organize your tasks, notes, and goals.</p>
+          <div className="empty-icon"><Icon name="projects" size={24} /></div>
+          <h3 className="empty-title">No projects yet</h3>
+          <p className="empty-line">Create a project to organize your tasks, notes, and goals.</p>
         </div>
       ) : (
         <>
@@ -106,7 +106,7 @@ export function ProjectsPage() {
                     <div className="progress">
                       <div className="progress-track" style={{ transform: `scaleX(${cumulative / 100})`, background: p.color }} />
                     </div>
-                    <div className="projects-card-status">{statusLabel[p.status] ?? p.status}</div>
+                    <span className="badge badge-plain">{statusLabel[p.status] ?? p.status}</span>
                   </button>
                 );
               })}

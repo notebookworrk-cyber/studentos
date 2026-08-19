@@ -114,14 +114,14 @@
   white-space: nowrap;
 }
 .palette-mark {
-  background: var(--accent-soft);
+  background: var(--accent-soft-9);
   color: var(--accent);
   border-radius: 2px;
   padding: 0 1px;
   font-weight: 700;
 }
 .palette-item.active {
-  background: var(--accent-soft);
+  background: var(--accent-soft-9);
   color: var(--ink);
 }
 .palette-item.active .palette-item-icon {

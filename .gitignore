@@ -6,3 +6,5 @@ models/
 build.log
 build.err.log
 *.blockmap
+*.log
+tsconfig.tsbuildinfo

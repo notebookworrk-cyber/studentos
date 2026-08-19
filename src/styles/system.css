@@ -1,0 +1,47 @@
+/* ───── System primitives ─────
+   Canonical shared primitives, imported LAST so they win over
+   per-module duplicates. One source of truth per semantic role. */
+
+/* Danger button — single definition */
+.btn.danger {
+  color: var(--danger);
+}
+.btn.danger:hover {
+  background: var(--danger-soft);
+}
+
+/* Active icon button — generic accent tint */
+.icon-btn.active,
+.btn-icon.active {
+  background: var(--accent-soft-9);
+  color: var(--accent);
+}
+.icon-btn.active.warn,
+.btn-icon.active.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* Surface block — the shared "panel" material */
+.surface-block {
+  position: relative;
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-edge);
+  padding: var(--space-5);
+}
+
+/* Rail label — overline above side rails (study, notes, research) */
+.rail-label {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* Full-width utility */
+.w-full {
+  width: 100%;
+}

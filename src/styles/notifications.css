@@ -17,7 +17,7 @@
   padding: 0 4px;
   border-radius: 8px;
   background: var(--warn);
-  color: #131a2b;
+  color: var(--on-accent);
   font-size: 10px;
   font-weight: 700;
   line-height: 16px;

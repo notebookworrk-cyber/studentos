@@ -255,7 +255,7 @@ export function SettingsPage() {
               <strong>Dynamic atmosphere</strong>
               <em>Shift wallpaper with the time of day</em>
             </span>
-            <input type="checkbox" checked={dynamicAtmosphere} onChange={(e) => setDynamicAtmosphere(e.target.checked)} />
+            <input type="checkbox" className="toggle" aria-label="Dynamic atmosphere" checked={dynamicAtmosphere} onChange={(e) => setDynamicAtmosphere(e.target.checked)} />
           </label>
           <label className="wallpaper-toggle">
             <span>
@@ -283,12 +283,13 @@ export function SettingsPage() {
         </div>
         <div className="settings-row">
           <div className="settings-row-label">Show a new quote on the home page each day</div>
-          <button
-            className={`seg-item ${quotesEnabled ? "active" : ""}`}
-            onClick={() => setQuotesEnabled(!quotesEnabled)}
-          >
-            {quotesEnabled ? "On" : "Off"}
-          </button>
+          <input
+            type="checkbox"
+            className="toggle"
+            aria-label="Daily quotes"
+            checked={quotesEnabled}
+            onChange={(e) => setQuotesEnabled(e.target.checked)}
+          />
         </div>
       </section>
 
@@ -301,12 +302,13 @@ export function SettingsPage() {
         </div>
         <div className="settings-row">
           <div className="settings-row-label">Event reminders, task due times, focus alerts and a daily digest</div>
-          <button
-            className={`seg-item ${notificationsEnabled ? "active" : ""}`}
-            onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-          >
-            {notificationsEnabled ? "On" : "Off"}
-          </button>
+          <input
+            type="checkbox"
+            className="toggle"
+            aria-label="Notifications"
+            checked={notificationsEnabled}
+            onChange={(e) => setNotificationsEnabled(e.target.checked)}
+          />
         </div>
       </section>
 
@@ -331,10 +333,10 @@ export function SettingsPage() {
             maxLength={50}
           />
         </div>
-        <p className="settings-row-label" style={{ fontSize: "12px", color: "var(--ink-3)", marginTop: "8px" }}>
+        <p className="settings-hint">
           {location ? `Saved: ${location.city} (${location.lat.toFixed(2)}, ${location.lon.toFixed(2)})` : "No location set"}
         </p>
-        <div className="settings-row" style={{ marginTop: "8px" }}>
+        <div className="settings-row">
           <button className="btn btn-primary btn-sm" onClick={async () => {
             const { detectLocation, geocodeCity, saveLocation } = await import("../../lib/weather");
             const detected = await detectLocation();
@@ -355,7 +357,7 @@ export function SettingsPage() {
             <Icon name="search" size={13} />
             Auto-detect Location
           </button>
-          <button className="btn btn-ghost btn-sm" style={{ marginLeft: "8px" }} onClick={async () => {
+          <button className="btn btn-ghost btn-sm" onClick={async () => {
             const { geocodeCity, saveLocation } = await import("../../lib/weather");
             const city = location?.city ?? "";
             if (!city) return;
@@ -391,7 +393,7 @@ export function SettingsPage() {
             Data
           </div>
         </div>
-        <div className="settings-row" style={{ marginBottom: 12 }}>
+        <div className="settings-row">
           <div className="settings-row-label">Export everything to a JSON backup, or restore from one</div>
           <div className="settings-row-actions">
             <button className="btn btn-ghost btn-sm" onClick={handleExport}>
@@ -419,7 +421,7 @@ export function SettingsPage() {
             e.target.value = "";
           }}
         />
-        <p className="study-res-item-sub" style={{ marginBottom: 12 }}>
+        <p className="study-res-item-sub settings-hint">
           Resets tasks, events, notes, goals, sessions and history to the original starter state.
         </p>
         {!confirmReset ? (

@@ -51,6 +51,13 @@
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 
+.cal-seg .seg-item:focus-visible,
+.cal-filter-chip:focus-visible,
+.mv-cell:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
 .cal-seg .seg-item:hover {
   background: var(--hover-bg);
   color: var(--ink);
