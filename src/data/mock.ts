@@ -118,7 +118,7 @@ export const seedEvents: CalendarEvent[] = [
 
 export const projects: Project[] = [
   { id: "p1", name: "StudentOS 2.0", description: "Operating system for students — AI-powered study environment", color: "#3b82f6", progress: 34, lastActivity: "Today", status: "active", createdAt: "2026-06-01T00:00:00Z", updatedAt: "2026-08-13T00:00:00Z" },
-  { id: "p2", name: "Zoya Easy Code", description: "Python web framework for rapid development", color: "#8b5cf6", progress: 68, lastActivity: "Yesterday", status: "active", createdAt: "2026-05-15T00:00:00Z", updatedAt: "2026-08-12T00:00:00Z" },
+  { id: "p2", name: "Physics Notes", description: "Exam revision notes and problem sets", color: "#8b5cf6", progress: 68, lastActivity: "Yesterday", status: "active", createdAt: "2026-05-15T00:00:00Z", updatedAt: "2026-08-12T00:00:00Z" },
   { id: "p3", name: "AI Healthcare", description: "Machine learning models for medical diagnosis", color: "#22c55e", progress: 21, lastActivity: "This week", status: "paused", createdAt: "2026-07-01T00:00:00Z", updatedAt: "2026-08-08T00:00:00Z" },
 ];
 
@@ -169,7 +169,7 @@ export const seedFolders: string[] = [
   "Research/Sources",
   "Research/Ideas",
   "Projects/StudentOS",
-  "Projects/Zoya Easy Code",
+  "Projects/Physics Notes",
   "Projects/AI Healthcare",
   "Personal/Notes",
   "Personal/Ideas",
