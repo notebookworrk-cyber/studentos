@@ -19,6 +19,19 @@ export function StudyPractice() {
   const topic = focusTopic ?? subject?.topics.find((t) => !t.done);
 
   if (!subject) return null;
+  if (practiceQuestions.length === 0) {
+    return (
+      <section className="study-block surface">
+        <div className="panel-head">
+          <div className="panel-title">
+            <Icon name="target" />
+            Quick Practice
+          </div>
+        </div>
+        <p className="practice-done-line">Add practice questions to your study material to start quizzing yourself.</p>
+      </section>
+    );
+  }
 
   const n = practiceQuestions.length;
   const q = practiceQuestions[Math.min(idx, n - 1)];

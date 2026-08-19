@@ -84,6 +84,7 @@ export function StudyResources() {
         </section>
       </div>
 
+      {studyVideos.length > 0 && (
       <section className="study-block surface">
         <div className="panel-head">
           <div className="panel-title">
@@ -113,6 +114,7 @@ export function StudyResources() {
         </div>
         <p className="study-res-meta">Live YouTube search opens in your browser. In-app playback is a future milestone.</p>
       </section>
+      )}
 
       <div className="study-res-grid">
         <section className="study-block surface">
