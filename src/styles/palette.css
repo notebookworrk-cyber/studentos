@@ -1,0 +1,238 @@
+/* ───── Command palette ───── */
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fade-in 0.15s var(--ease);
+}
+
+.palette {
+  width: min(560px, calc(100vw - 48px));
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  background: var(--glass-deep-bg);
+  border: 1px solid var(--glass-deep-line);
+  box-shadow: var(--shadow-lg), var(--glass-edge-strong);
+  animation: palette-in 0.18s var(--ease);
+}
+
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.palette-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+.palette-search-icon {
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+.palette-input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+}
+.palette-input::placeholder {
+  color: var(--ink-3);
+}
+
+.palette-list {
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.palette-group-label {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 7px var(--space-3);
+  border-radius: var(--r-sm);
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  transition: background var(--t-fast) var(--ease);
+}
+.palette-item .palette-item-icon {
+  color: var(--ink-3);
+}
+.palette-item .palette-item-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.palette-item .palette-item-hint {
+  font-size: var(--text-caption);
+  font-weight: 400;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.palette-mark {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 1px;
+  font-weight: 700;
+}
+.palette-item.active {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.palette-item.active .palette-item-icon {
+  color: var(--accent);
+}
+.palette-item-enter {
+  margin-left: auto;
+  display: flex;
+}
+
+.palette-empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--ink-3);
+  font-size: var(--text-body);
+}
+
+.palette-foot {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--line);
+  font-size: var(--text-caption);
+  color: var(--ink-3);
+}
+
+/* ───── Keycaps ───── */
+.kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  background: var(--hover-bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+/* ───── Toasts ───── */
+.toasts {
+  position: fixed;
+  top: var(--space-5);
+  right: var(--space-5);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--glass-strong-bg);
+  border: 1px solid var(--glass-strong-border);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  pointer-events: auto;
+  animation: toast-in 0.22s var(--ease);
+}
+.toast-msg {
+  flex: 1;
+  min-width: 0;
+}
+.toast-close {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.toast-close:hover {
+  background: var(--inset-line);
+  color: var(--ink);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.toast-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.toast-dot-ok {
+  background: var(--good);
+}
+.toast-dot-warn {
+  background: var(--warn);
+}
+.toast-dot-err {
+  background: var(--danger);
+}
+.toast-dot-info {
+  background: var(--accent);
+}

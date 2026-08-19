@@ -1,0 +1,27 @@
+[5860:0815/184949.015:VERBOSE1:base\allocator\scheduler_loop_quarantine_config.cc:168] No entry found for browser/global.
+[5860:0815/184949.015:VERBOSE1:base\allocator\scheduler_loop_quarantine_config.cc:168] No entry found for browser/*.
+[5860:0815/184949.015:VERBOSE1:base\allocator\scheduler_loop_quarantine_config.cc:168] No entry found for /main.
+[5860:0815/184949.030:VERBOSE1:base\allocator\scheduler_loop_quarantine_config.cc:168] No entry found for /io.
+[5860:0815/184949.146:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.150] Display: EVENT: screen_win.cc:1043 Displays updated, count: 1
+[5860:0815/184949.146:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.156] Display: EVENT: screen_win.cc:1045 Display[4060460697] bounds=[0,0 1536x864], workarea=[0,0 1536x864], scale=1.25, rotation=0, panel_rotation=0 external detected
+[5860:0815/184949.146:VERBOSE1:components\proxy_config\pref_proxy_config_tracker_impl.cc:462] 0x43f40045e080: set chrome proxy config service to 0x43f400525500
+[5860:0815/184949.177:VERBOSE1:components\proxy_config\pref_proxy_config_tracker_impl.cc:462] 0x43f40045f740: set chrome proxy config service to 0x43f400527640
+[5860:0815/184949.253:VERBOSE1:content\browser\first_party_sets\first_party_sets_handler_impl_instance.cc:270] Empty path. Failed initializing First-Party Sets database.
+[5860:0815/184949.254:VERBOSE1:base\allocator\scheduler_loop_quarantine_config.cc:168] No entry found for browser/io.
+[5860:0815/184949.263:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.264] Display: EVENT: screen_win.cc:1043 Displays updated, count: 1
+[5860:0815/184949.264:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.264] Display: EVENT: screen_win.cc:1045 Display[4060460697] bounds=[0,0 1536x864], workarea=[0,0 1536x864], scale=1.25, rotation=0, panel_rotation=0 external detected
+[5860:0815/184949.328:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.331] Display: EVENT: screen_win.cc:1043 Displays updated, count: 1
+[5860:0815/184949.328:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.332] Display: EVENT: screen_win.cc:1045 Display[4060460697] bounds=[0,0 1536x864], workarea=[0,0 1536x864], scale=1.25, rotation=0, panel_rotation=0 external detected
+[5860:0815/184949.579:INFO:CONSOLE:789] "[vite] connecting...", source: http://localhost:5173/@vite/client (789)
+[5860:0815/184949.621:INFO:CONSOLE:912] "[vite] connected.", source: http://localhost:5173/@vite/client (912)
+[5860:0815/184949.661:INFO:CONSOLE:21609] "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold", source: http://localhost:5173/node_modules/.vite/deps/chunk-46R24RP5.js?v=e4386ea6 (21609)
+[5860:0815/184949.687:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.688] Display: EVENT: screen_win.cc:1043 Displays updated, count: 1
+[5860:0815/184949.688:VERBOSE1:components\device_event_log\device_event_log_impl.cc:203] [18:49:49.688] Display: EVENT: screen_win.cc:1045 Display[4060460697] bounds=[0,0 1536x864], workarea=[0,0 1536x864], scale=1.25, rotation=0, panel_rotation=0 external detected
+[5860:0815/184949.882:INFO:CONSOLE:2] "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.", source: node:electron/js2c/sandbox_bundle (2)

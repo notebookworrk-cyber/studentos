@@ -1,0 +1,288 @@
+:root,
+[data-theme="dark"] {
+  --font-sans: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+
+  /* ── Typography scale ── */
+  --text-display: 40px;
+  --text-h1: 26px;
+  --text-h2: 20px;
+  --text-h3: 17px;
+  --text-body: 14px;
+  --text-sm: 12.5px;
+  --text-caption: 12px;
+  --text-meta: 11px;
+  --text-label: 11px;
+  --text-subheading: 13px;
+  --leading-tight: 1.25;
+  --leading-body: 1.55;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.08em;
+  --tracking-widest: 0.12em;
+
+  /* ── Apple-style label ramp (dark) ── */
+  --label-1: #f5f6fa;
+  --label-2: rgba(245, 246, 250, 0.72);
+  --label-3: rgba(245, 246, 250, 0.48);
+  --label-4: rgba(245, 246, 250, 0.28);
+
+  --ink: var(--label-1);
+  --ink-2: var(--label-2);
+  --ink-3: var(--label-3);
+
+  --line: rgba(255, 255, 255, 0.07);
+  --line-strong: rgba(255, 255, 255, 0.14);
+
+  /* Color system */
+  --soft-white: #eef4ff;
+  --navy: #0b1220;
+  --navy-deep: #070b16;
+  --indigo: #7c8ee8;
+
+  --accent: #5f9dff;
+  --accent-2: #9a7bff;
+  --accent-hover: #74abff;
+  --cyan: #4fd6e8;
+  --good: #59d69a;
+  --warn: #f2b556;
+  --danger: #f27b7b;
+
+  /* Semantic color roles */
+  --color-action: var(--accent);
+  --color-success: var(--good);
+  --color-warning: var(--warn);
+  --color-error: var(--danger);
+  --color-focus: var(--accent);
+  --color-category: var(--cyan);
+
+  /* ── Surfaces (dark) ── */
+  --chrome-bg: #0a0f1c;
+  --panel-bg: #101828;
+  --panel-bg-strong: #141d30;
+  --panel-bg-hover: #141d30;
+
+  --glass-clear-bg: #101828;
+  --glass-clear-blur: 12px;
+  --glass-clear-line: rgba(255, 255, 255, 0.08);
+
+  --glass-soft-bg: #101828;
+  --glass-soft-blur: 20px;
+  --glass-soft-line: rgba(255, 255, 255, 0.08);
+
+  --glass-deep-bg: #141d30;
+  --glass-deep-blur: 32px;
+  --glass-deep-line: rgba(255, 255, 255, 0.12);
+
+  --glass-edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  --glass-edge-strong: inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
+
+  --surface-bg: #101828;
+  --surface-bg-strong: #141d30;
+  --surface-line: rgba(255, 255, 255, 0.07);
+
+  /* Legacy aliases */
+  --glass-light-bg: var(--glass-clear-bg);
+  --glass-light-blur: var(--glass-clear-blur);
+  --glass-medium-bg: var(--glass-soft-bg);
+  --glass-medium-blur: var(--glass-soft-blur);
+  --glass-strong-bg: var(--glass-deep-bg);
+  --glass-strong-blur: var(--glass-deep-blur);
+  --glass-strong-border: var(--glass-deep-line);
+  --glass-bg: var(--glass-soft-bg);
+  --glass-border: var(--glass-soft-line);
+  --glass-highlight: var(--glass-edge);
+
+  /* ── Semantic micro-tints (used by the white-alpha sweep) ── */
+  --hover-bg: rgba(255, 255, 255, 0.06);
+  --hover-bg-strong: rgba(255, 255, 255, 0.1);
+  --subtle-bg: rgba(255, 255, 255, 0.04);
+  --subtle-bg-2: rgba(255, 255, 255, 0.03);
+  --inset-line: rgba(255, 255, 255, 0.08);
+  --progress-track: rgba(255, 255, 255, 0.35);
+  --progress-track-2: rgba(255, 255, 255, 0.1);
+  --accent-soft: rgba(95, 157, 255, 0.14);
+  --accent-soft-2: rgba(95, 157, 255, 0.08);
+  --accent-soft-3: rgba(95, 157, 255, 0.25);
+  --accent-soft-4: rgba(95, 157, 255, 0.3);
+  --accent-soft-5: rgba(95, 157, 255, 0.5);
+  --accent-soft-6: rgba(95, 157, 255, 0.6);
+  --accent-soft-7: rgba(95, 157, 255, 0.2);
+  --accent-soft-8: rgba(95, 157, 255, 0.35);
+  --accent-soft-9: rgba(95, 157, 255, 0.16);
+  --accent-soft-10: rgba(95, 157, 255, 0.05);
+  --accent-soft-11: rgba(95, 157, 255, 0.1);
+  --accent-soft-12: rgba(95, 157, 255, 0.12);
+  --danger-soft: rgba(242, 123, 123, 0.14);
+  --warn-soft: rgba(242, 181, 86, 0.08);
+  --good-soft: rgba(89, 214, 154, 0.14);
+
+  /* Text on filled accents / badge label colors */
+  --on-accent: #07111f;
+  --on-danger: #1c0606;
+  --badge-tint: #9db9e8;
+  --badge-purple: #b3a6e8;
+  --badge-cyan: #8fd6e0;
+  --badge-green: #8fd8b4;
+  --badge-amber: #d9b987;
+  --badge-red: #d99a9a;
+  --hover-border: rgba(255, 255, 255, 0.22);
+  --hover-bg-soft: rgba(255, 255, 255, 0.05);
+  --hover-bg-3: rgba(255, 255, 255, 0.12);
+  --inset-line-soft: rgba(255, 255, 255, 0.09);
+  --lockin-text: #c9bfff;
+  --lockin-text-strong: #ded7ff;
+  --danger-text: #ff9d9d;
+  --danger-text-strong: #ffb3b3;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 12px -6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.28), 0 12px 28px -14px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.3), 0 28px 64px -24px rgba(0, 0, 0, 0.6);
+  --glass-shadow: var(--shadow-md);
+
+  --focus-ring: rgba(95, 157, 255, 0.4);
+  --overlay-bg: rgba(4, 8, 20, 0.45);
+
+  /* ── Space ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+
+  --space-page: var(--space-8);
+  --space-section: var(--space-6);
+  --space-card: var(--space-5);
+  --space-control: var(--space-2);
+  --space-nav: var(--space-3);
+  --space-modal: var(--space-6);
+
+  /* ── Curve language ── */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 16px;
+  --r-hero: 16px;
+  --r-pill: 999px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 130ms;
+  --t-med: 240ms;
+  --t-slow: 480ms;
+  --t-press: 80ms;
+}
+
+/* ─────────────────────── Light (Apple grouped canvas) ─────────────────────── */
+[data-theme="light"] {
+  --text-display: 40px;
+  --text-h1: 26px;
+  --text-h2: 20px;
+  --text-h3: 17px;
+
+  --label-1: #1d1d1f;
+  --label-2: rgba(29, 29, 31, 0.62);
+  --label-3: rgba(29, 29, 31, 0.4);
+  --label-4: rgba(29, 29, 31, 0.22);
+
+  --ink: var(--label-1);
+  --ink-2: var(--label-2);
+  --ink-3: var(--label-3);
+
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.14);
+
+  /* Accents unchanged — pop on white */
+  --accent: #0a84ff;
+  --accent-2: #8e6bf0;
+  --accent-hover: #0a66d0;
+  --cyan: #0a9ec0;
+  --good: #34c759;
+  --warn: #ff9f0a;
+  --danger: #ff453a;
+  --color-action: var(--accent);
+  --color-success: var(--good);
+  --color-warning: var(--warn);
+  --color-error: var(--danger);
+  --color-focus: var(--accent);
+  --color-category: var(--cyan);
+
+  /* Surfaces — grouped gray canvas, white cards */
+  --chrome-bg: #f2f2f7;
+  --panel-bg: #ffffff;
+  --panel-bg-strong: #ffffff;
+  --panel-bg-hover: #f5f5f7;
+
+  --glass-clear-bg: rgba(255, 255, 255, 0.72);
+  --glass-clear-line: rgba(0, 0, 0, 0.1);
+  --glass-soft-bg: rgba(255, 255, 255, 0.8);
+  --glass-soft-line: rgba(0, 0, 0, 0.1);
+  --glass-deep-bg: #ffffff;
+  --glass-deep-line: rgba(0, 0, 0, 0.12);
+
+  --glass-edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --glass-edge-strong: inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+
+  --surface-bg: #ffffff;
+  --surface-bg-strong: #f8f8fa;
+  --surface-line: rgba(0, 0, 0, 0.08);
+
+  /* Micro-tints flip to dark-on-white */
+  --hover-bg: rgba(0, 0, 0, 0.05);
+  --hover-bg-strong: rgba(0, 0, 0, 0.09);
+  --subtle-bg: rgba(0, 0, 0, 0.04);
+  --subtle-bg-2: rgba(0, 0, 0, 0.03);
+  --inset-line: rgba(0, 0, 0, 0.09);
+  --progress-track: rgba(0, 0, 0, 0.12);
+  --progress-track-2: rgba(0, 0, 0, 0.1);
+  --accent-soft: rgba(10, 132, 255, 0.14);
+  --accent-soft-2: rgba(10, 132, 255, 0.08);
+  --accent-soft-3: rgba(10, 132, 255, 0.25);
+  --accent-soft-4: rgba(10, 132, 255, 0.18);
+  --accent-soft-5: rgba(10, 132, 255, 0.3);
+  --accent-soft-6: rgba(10, 132, 255, 0.35);
+  --accent-soft-7: rgba(10, 132, 255, 0.16);
+  --accent-soft-8: rgba(10, 132, 255, 0.2);
+  --accent-soft-9: rgba(10, 132, 255, 0.12);
+  --accent-soft-10: rgba(10, 132, 255, 0.06);
+  --accent-soft-11: rgba(10, 132, 255, 0.1);
+  --accent-soft-12: rgba(10, 132, 255, 0.1);
+  --danger-soft: rgba(255, 69, 58, 0.12);
+  --warn-soft: rgba(255, 159, 10, 0.12);
+  --good-soft: rgba(52, 199, 89, 0.16);
+
+  --on-accent: #ffffff;
+  --on-danger: #ffffff;
+  --badge-tint: #0a66c2;
+  --badge-purple: #7b5fd9;
+  --badge-cyan: #0a6b84;
+  --badge-green: #1f8f4d;
+  --badge-amber: #8f6400;
+  --badge-red: #c53b2e;
+  --hover-border: rgba(0, 0, 0, 0.18);
+  --hover-bg-soft: rgba(0, 0, 0, 0.04);
+  --hover-bg-3: rgba(0, 0, 0, 0.1);
+  --inset-line-soft: rgba(0, 0, 0, 0.1);
+  --lockin-text: #6b4fc0;
+  --lockin-text-strong: #5b3fc0;
+  --danger-text: #c53b2e;
+  --danger-text-strong: #a82f24;
+
+  /* Apple card shadow — soft, low-contrast */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.07), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1), 0 16px 48px rgba(0, 0, 0, 0.1);
+  --glass-shadow: var(--shadow-md);
+
+  --focus-ring: rgba(10, 132, 255, 0.35);
+  --overlay-bg: rgba(0, 0, 0, 0.35);
+}

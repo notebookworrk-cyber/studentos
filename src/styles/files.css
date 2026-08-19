@@ -1,0 +1,162 @@
+/* ───── Files toolbar ───── */
+.files-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+/* ───── Breadcrumb ───── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: var(--space-4);
+}
+.crumb {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.crumb:hover {
+  background: var(--surface-line);
+  color: var(--ink);
+}
+.crumb-sep {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-3);
+}
+
+/* ───── Folder grid ───── */
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.folder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: var(--space-4);
+  border-radius: var(--r-lg);
+  /* Content region: flat translucent surface, no blur, no gradient. */
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-line);
+  box-shadow: var(--glass-edge);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.folder-card:hover {
+  background: var(--surface-bg-strong);
+  border-color: var(--accent-soft-4);
+}
+.folder-ic {
+  color: var(--accent-2);
+}
+.folder-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.folder-count {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* ───── File rows ───── */
+.files-list {
+  display: flex;
+  flex-direction: column;
+}
+.files-grid {
+  margin-top: var(--space-2);
+}
+.layout-seg {
+  flex-shrink: 0;
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.file-row:last-child {
+  border-bottom: none;
+}
+.file-row:hover {
+  background: var(--subtle-bg-2);
+}
+.file-ic {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.file-ic.folder {
+  color: var(--accent-2);
+}
+.file-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.file-kind {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+.icon-pin {
+  color: var(--accent-2);
+  flex-shrink: 0;
+}
+.icon-star {
+  color: var(--warn);
+  flex-shrink: 0;
+}
+.field-folder {
+  color: var(--ink-2);
+}
+
+@media (max-width: 640px) {
+  .files-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .folder-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

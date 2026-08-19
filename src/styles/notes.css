@@ -1,0 +1,377 @@
+/* ───── Notes toolbar ───── */
+.notes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+/* ───── Three-pane workspace: folders rail | list | editor ───── */
+.notes-panes {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.notes-panes.has-editor {
+  grid-template-columns: 180px minmax(240px, 0.9fr) minmax(0, 1.6fr);
+}
+
+.notes-rail {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--panel-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.notes-rail-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: var(--space-2) var(--space-3) var(--space-2);
+}
+.notes-rail-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 7px var(--space-3);
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.notes-rail-item:hover {
+  background: var(--hover-bg);
+  color: var(--ink);
+}
+.notes-rail-item.active {
+  background: var(--accent-soft-2);
+  color: var(--accent);
+  font-weight: 600;
+}
+.notes-rail-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.notes-rail-item.active .notes-rail-count {
+  color: var(--accent-2);
+}
+
+.notes-list-col {
+  min-width: 0;
+}
+
+.notes-editor-col {
+  position: sticky;
+  top: 0;
+  min-height: 0;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4) var(--space-5);
+  background: var(--panel-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+@media (max-width: 1080px) {
+  .notes-panes,
+  .notes-panes.has-editor {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+  .notes-editor-col {
+    grid-column: 1 / -1;
+    position: static;
+    max-height: none;
+  }
+}
+@media (max-width: 720px) {
+  .notes-panes,
+  .notes-panes.has-editor {
+    grid-template-columns: 1fr;
+  }
+  .notes-rail {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+  .notes-rail-label {
+    display: none;
+  }
+  .notes-rail-count {
+    display: none;
+  }
+}
+
+/* ───── Note list — clean rows, Notion-style ───── */
+.note-list {
+  display: flex;
+  flex-direction: column;
+}
+.note-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-3) var(--space-2);
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), transform var(--t-press) var(--ease);
+}
+.note-row:hover {
+  background: var(--subtle-bg);
+}
+.note-row:active {
+  transform: scale(0.99);
+}
+.note-row.pinned .note-row-title {
+  color: var(--accent);
+}
+.note-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.note-row-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.note-row-preview {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.note-row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+.note-row-tags {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.note-row-edited {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.note-row-flags {
+  display: flex;
+  gap: 5px;
+  color: var(--ink-3);
+}
+.note-row-flags .icon-star {
+  color: var(--warn);
+}
+
+@media (max-width: 720px) {
+  .note-row-meta .note-row-tags,
+  .note-row-meta .note-row-edited {
+    display: none;
+  }
+}
+
+/* ───── Editor — calm, spacious, typography-first ───── */
+.editor {
+  display: flex;
+  flex-direction: column;
+}
+.notes-editor-col .editor {
+  min-height: 0;
+}
+.editor-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: var(--space-4);
+}
+.editor-spacer {
+  flex: 1;
+}
+.editor-save {
+  font-size: 12px;
+  color: var(--good);
+}
+.editor-save.muted {
+  color: var(--ink-3);
+}
+.editor-top .btn-icon.active {
+  background: rgba(242, 181, 86, 0.14);
+  color: var(--warn);
+}
+.editor-top .btn-icon.active .icon-star {
+  color: var(--warn);
+}
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: var(--space-6);
+  flex: 1;
+}
+.editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  /* Comfortable reading measure — writing never spans edge to edge. */
+  max-width: 720px;
+}
+.editor-title {
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-family: var(--font-sans);
+  padding: 0;
+  border-bottom: 1px solid transparent;
+  caret-color: var(--accent);
+}
+.editor-title:focus {
+  border-bottom-color: var(--line);
+}
+.editor-title::placeholder {
+  color: var(--ink-3);
+}
+.editor-content {
+  flex: 1;
+  min-height: 50vh;
+  background: transparent;
+  border: none;
+  resize: none;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.8;
+  letter-spacing: 0.005em;
+  padding: 0;
+  caret-color: var(--accent);
+}
+.editor-content::placeholder {
+  color: var(--ink-3);
+}
+.editor-title::selection,
+.editor-content::selection {
+  background: var(--accent-soft-4);
+}
+.editor-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.editor-meta .field {
+  gap: 6px;
+}
+.editor-meta-foot {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.btn.confirming.danger {
+  background: rgba(242, 123, 123, 0.2);
+  color: var(--danger);
+  border-color: rgba(242, 123, 123, 0.4);
+}
+
+@media (max-width: 1080px) {
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+  .editor-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .editor-meta .field {
+    flex: 1;
+    min-width: 180px;
+  }
+}
+
+/* ───── Editor AI menu ───── */
+.editor-ai-group {
+  position: relative;
+}
+.editor-ai-group .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.editor-ai-caret {
+  transition: transform var(--t-fast) var(--ease);
+}
+.editor-ai-caret.open {
+  transform: rotate(180deg);
+}
+.editor-ai-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2);
+  background: var(--panel-bg-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+.editor-ai-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--label-1);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.editor-ai-item:hover {
+  background: var(--hover-bg);
+}
+.editor-ai-item strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.editor-ai-item em {
+  display: block;
+  font-size: 11.5px;
+  color: var(--label-3);
+  font-style: normal;
+  margin-top: 1px;
+}

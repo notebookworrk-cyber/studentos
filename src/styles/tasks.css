@@ -1,0 +1,295 @@
+/* ───── Shared page header ───── */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-5);
+}
+.page-title {
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 6px;
+}
+.page-subtitle {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+/* ───── Tasks toolbar ───── */
+.tasks-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--r-md);
+  background: var(--hover-bg-soft);
+  border: 1px solid var(--line-strong);
+}
+.seg-item {
+  padding: 7px 14px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-press) var(--ease);
+}
+.seg-item:hover {
+  color: var(--ink);
+}
+.seg-item:active {
+  transform: scale(0.97);
+}
+.seg-item.active {
+  background: var(--accent-soft-9);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--accent-soft-8);
+}
+.toolbar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: var(--r-sm);
+  background: var(--hover-bg-soft);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-3);
+}
+.search .icon {
+  flex-shrink: 0;
+}
+.search-input {
+  border: none;
+  background: transparent;
+  padding: 9px 0;
+  width: 180px;
+}
+.search-input:focus {
+  box-shadow: none;
+}
+.input:not(.search-input) {
+  background: var(--hover-bg-soft);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  border-radius: var(--r-sm);
+  padding: 9px 12px;
+  font-size: 13px;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.input:focus {
+  border-color: var(--accent-soft-6);
+  background: var(--inset-line);
+}
+.toolbar-select {
+  max-width: 150px;
+  cursor: pointer;
+}
+.toolbar-select option,
+.input option {
+  background: #101a2e;
+  color: var(--ink);
+}
+
+/* ───── Task rows ───── */
+.task-list {
+  display: flex;
+  flex-direction: column;
+}
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--line);
+  transition: background var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease), transform var(--t-press) var(--ease);
+}
+.task-row:last-child {
+  border-bottom: none;
+}
+.task-row:hover {
+  background: var(--subtle-bg-2);
+}
+.task-row:active {
+  transform: scale(0.995);
+}
+.task-row.done {
+  opacity: 0.5;
+}
+.task-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease), transform var(--t-press) var(--ease);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.task-check:hover {
+  border-color: var(--good);
+}
+.task-check.on {
+  background: var(--good);
+  border-color: transparent;
+  color: #04160e;
+  animation: task-pop var(--t-med) var(--ease);
+}
+@keyframes task-pop {
+  from {
+    transform: scale(0.85);
+  }
+}
+.task-main {
+  flex: 1;
+  min-width: 0;
+}
+.task-title-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.task-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.task-row.done .task-title {
+  text-decoration: line-through;
+}
+.task-time {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.task-desc {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 3px 0 8px;
+}
+.task-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.task-tags .badge {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.task-due {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-left: auto;
+}
+.task-overdue {
+  margin-left: 2px;
+}
+.task-actions {
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.task-row:hover .task-actions,
+.task-row:focus-within .task-actions,
+.task-row .task-actions:focus-within {
+  opacity: 1;
+  transform: translateX(0);
+}
+@media (hover: none) {
+  .task-actions {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ───── Overdue box ───── */
+.overdue-box {
+  border: 1px solid rgba(242, 123, 123, 0.25);
+  border-radius: var(--r-lg);
+  background: rgba(242, 123, 123, 0.05);
+  padding: var(--space-3) var(--space-3) 0;
+  margin-bottom: var(--space-5);
+}
+.overdue-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-2);
+  padding: 0 var(--space-2);
+}
+.overdue-note {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* ───── Empty state ───── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: var(--space-10) var(--space-4);
+}
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-bottom: var(--space-3);
+}
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+.empty-line {
+  color: var(--ink-2);
+  font-size: 14px;
+  margin: 0 0 var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .toolbar-controls {
+    width: 100%;
+  }
+  .search {
+    flex: 1;
+  }
+  .search-input {
+    width: auto;
+    flex: 1;
+  }
+}

@@ -1,0 +1,11 @@
+[8316:0815/185300.317:INFO:CONSOLE:789] "[vite] connecting...", source: http://localhost:5173/@vite/client (789)
+[8316:0815/185300.332:INFO:CONSOLE:912] "[vite] connected.", source: http://localhost:5173/@vite/client (912)
+[8316:0815/185300.393:INFO:CONSOLE:21609] "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold", source: http://localhost:5173/node_modules/.vite/deps/chunk-46R24RP5.js?v=e4386ea6 (21609)
+[8316:0815/185300.604:INFO:CONSOLE:2] "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.", source: node:electron/js2c/sandbox_bundle (2)

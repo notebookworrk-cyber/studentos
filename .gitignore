@@ -1,0 +1,8 @@
+node_modules/
+release/
+dist/
+models/
+*.gguf
+build.log
+build.err.log
+*.blockmap

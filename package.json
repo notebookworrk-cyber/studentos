@@ -1,0 +1,85 @@
+{
+  "name": "studentos",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "author": "Lucky (notebookworrk-cyber)",
+  "description": "StudentOS — an all-in-one desktop OS for students: tasks, calendar, notes, study planner, focus timer, projects, research, terminal, browser and a local AI assistant.",
+  "license": "MIT",
+  "homepage": "https://github.com/notebookworrk-cyber/studentos",
+  "main": "electron/main.js",
+  "build": {
+    "appId": "com.studentos.app",
+    "productName": "StudentOS",
+    "asar": false,
+    "npmRebuild": false,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "electronDist": "node_modules/electron/dist",
+    "compression": "store",
+    "artifactName": "StudentOS-Setup-${version}.${ext}",
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "StudentOS",
+      "runAfterFinish": true
+    },
+    "extraResources": [
+      {
+        "from": "models",
+        "to": "models",
+        "filter": ["**/*.gguf"]
+      }
+    ]
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "desktop": "npm run build && electron .",
+    "dev:desktop": "STUDENTOS_DEV=1 ELECTRON_START_URL=http://localhost:5173 electron ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0",
+    "@google/generative-ai": "^0.24.1",
+    "node-llama-cpp": "^3.20.0",
+    "node-pty": "^1.1.0",
+    "openai": "^7.4.0",
+    "pdfjs-dist": "^6.2.108",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.3",
+    "vitest": "^4.1.10",
+    "xterm": "^5.3.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "electron": true,
+    "node-pty": true,
+    "@electron/rebuild": true
+  }
+}

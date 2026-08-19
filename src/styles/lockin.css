@@ -1,0 +1,183 @@
+/* ───── Lock-In ───── */
+
+.lockin-page {
+  max-width: 760px;
+}
+
+.lockin-start {
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.lockin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.lockin-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lockin-begin {
+  width: 100%;
+  margin-top: var(--space-4);
+  padding: 13px;
+  font-size: 14.5px;
+}
+
+.lockin-alt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.lockin-alt-label {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-right: var(--space-1);
+}
+
+/* ───── Active session ─────
+   The working surface is nearly invisible — the wallpaper and the work
+   are the focus. No glow, no gradient wash, no blur on the active pane. */
+.lockin-active {
+  position: relative;
+  padding: var(--space-7) var(--space-6);
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+.lockin-active-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--good);
+}
+.lockin-active-title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: var(--space-3) 0 var(--space-2);
+}
+.lockin-active-meta {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+.lockin-ring {
+  position: relative;
+  width: min(220px, 70vw);
+  height: min(220px, 70vw);
+  margin: 0 auto var(--space-5);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(18, 26, 46, 0.92) 0 58%, transparent 58.5%),
+    conic-gradient(#9a7bff var(--pct), var(--hover-bg-strong) var(--pct));
+}
+.lockin-time {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.lockin-time-sub {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+.lockin-active-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ───── Immersive mode ───── */
+.content.immersive {
+  height: 100vh;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lockin-page.immersive {
+  max-width: 720px;
+  width: 100%;
+}
+.lockin-page.immersive .lockin-active {
+  margin: 0;
+  padding: var(--space-8);
+}
+.lockin-page.immersive .lockin-active-title {
+  font-size: clamp(28px, 4vw, 40px);
+}
+.lockin-page.immersive .lockin-ring {
+  width: min(280px, 70vw);
+  height: min(280px, 70vw);
+}
+.lockin-page.immersive .lockin-time {
+  font-size: 58px;
+}
+
+/* ───── History ───── */
+.lockin-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+.lockin-status {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lockin-status.completed {
+  background: rgba(89, 214, 154, 0.16);
+  color: var(--good);
+}
+.lockin-status.abandoned {
+  background: rgba(242, 123, 123, 0.16);
+  color: var(--danger);
+}
+.lockin-row-main {
+  flex: 1;
+  min-width: 0;
+}
+.lockin-row-min {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .lockin-form {
+    grid-template-columns: 1fr;
+  }
+}

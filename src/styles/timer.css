@@ -1,0 +1,136 @@
+/* ───── Timer ───── */
+
+@property --pct {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.timer-page {
+  max-width: 760px;
+}
+
+.timer-edit .lockin-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.timer-edit-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.timer-stage {
+  padding: var(--space-7) var(--space-6);
+  text-align: center;
+}
+
+.timer-ring {
+  --pct: 0%;
+  position: relative;
+  width: min(280px, 70vw);
+  height: min(280px, 70vw);
+  margin: 0 auto var(--space-5);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--panel-bg) 0 58%, transparent 58.5%),
+    conic-gradient(var(--accent) var(--pct), var(--hover-bg-strong) var(--pct));
+  transition: --pct 0.6s linear;
+}
+.timer-stage.break .timer-ring {
+  background:
+    radial-gradient(circle at center, var(--panel-bg) 0 58%, transparent 58.5%),
+    conic-gradient(var(--good) var(--pct), var(--hover-bg-strong) var(--pct));
+}
+.timer-ring::before {
+  content: "";
+  position: absolute;
+  inset: -28px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-soft) 0 42%, transparent 70%);
+  opacity: 0;
+  z-index: -1;
+}
+.timer-stage.break .timer-ring::before {
+  background: radial-gradient(circle, var(--good-soft, rgba(89, 214, 154, 0.25)) 0 42%, transparent 70%);
+}
+.timer-ring.running::before {
+  animation: timer-breathe 3.2s ease-in-out infinite;
+}
+@keyframes timer-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.03);
+  }
+}
+
+.timer-time {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--label-1);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.timer-time:hover {
+  background: var(--subtle-bg);
+}
+.timer-time:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.timer-time-sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label-2);
+  margin-top: 6px;
+  letter-spacing: 0;
+}
+
+.timer-sets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: var(--space-5);
+}
+.timer-sets-label {
+  font-size: 12.5px;
+  color: var(--label-3);
+  margin-left: 6px;
+}
+.timer-set-dot {
+  width: 6px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--progress-track-2);
+}
+.timer-set-dot.done {
+  background: var(--good);
+}
+.timer-set-dot.current {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-soft);
+}
+
+.timer-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}

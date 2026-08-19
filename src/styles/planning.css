@@ -1,0 +1,392 @@
+/* ───── Planning Mode ───── */
+
+.planning-page {
+  max-width: 1180px;
+}
+
+/* ───── Context strip ───── */
+.plan-context {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+.plan-context-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plan-context-stat .icon {
+  color: var(--ink-3);
+}
+.plan-context-value {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--ink);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.plan-context-label {
+  font-size: 11px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ───── Tabs ───── */
+.plan-tabs {
+  margin-bottom: var(--space-5);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* ───── Blocks ───── */
+.plan-block {
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.plan-danger {
+  color: var(--danger) !important;
+}
+
+/* ───── Time budget ───── */
+.plan-budget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.plan-budget-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.plan-budget-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.plan-budget-bar {
+  height: 6px;
+}
+.plan-budget-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: var(--space-2);
+}
+
+/* ───── Insights ───── */
+.plan-insights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.plan-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.plan-insights .plan-insight:last-child {
+  border-bottom: none;
+}
+.plan-insight.warn {
+  background: none;
+}
+.plan-insight.warn .plan-insight-title,
+.plan-insight.warn .plan-insight-line {
+  color: var(--warn);
+}
+.plan-insight .dot {
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.plan-dot-warn {
+  background: var(--warn) !important;
+}
+.plan-dot-ok {
+  background: var(--good) !important;
+}
+.plan-insight-title {
+  font-size: 13.5px;
+  font-weight: 650;
+}
+.plan-insight-line {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+
+/* ───── Daily actions ───── */
+.plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* ───── Goals ───── */
+.plan-goals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.plan-goal {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.plan-goals .plan-goal:last-child {
+  border-bottom: none;
+}
+.plan-goal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.plan-goal-title {
+  font-size: 14.5px;
+  font-weight: 650;
+  flex: 1;
+  min-width: 0;
+}
+.plan-goal-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.plan-goal-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--space-2);
+}
+.plan-goal-pct {
+  font-size: 12.5px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+.plan-goal-bar {
+  flex: 1;
+  height: 5px;
+}
+.plan-goal-bar .progress-track {
+  background: var(--accent);
+}
+.plan-goal-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-2);
+}
+.plan-goal-task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+.plan-goal-task .task-check {
+  width: 18px;
+  height: 18px;
+}
+.plan-goal-task-title {
+  flex: 1;
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plan-goal-task-title.done {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+.plan-goal-task-meta {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.plan-goal-link {
+  margin-top: var(--space-2);
+  color: var(--ink-2);
+}
+
+/* ───── Day planner timeline ───── */
+.plan-timeline {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-1);
+}
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-1);
+  border-bottom: 1px solid var(--line);
+}
+.plan-row:last-child {
+  border-bottom: none;
+}
+.plan-row.done {
+  opacity: 0.5;
+}
+.plan-row.conflict {
+  border-radius: var(--r-md);
+  background: rgba(242, 123, 123, 0.06);
+  border-bottom-color: rgba(242, 123, 123, 0.35);
+  padding: var(--space-2);
+}
+.plan-row-time {
+  width: 46px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.plan-row .task-check {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.plan-row-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plan-row-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+
+/* ───── Week view ───── */
+.plan-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.plan-day {
+  padding: var(--space-3);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: var(--subtle-bg-2);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.plan-day.today {
+  border-color: var(--accent-soft-5);
+  background: rgba(95, 157, 255, 0.07);
+}
+.plan-day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.plan-day-name {
+  font-size: 13px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.plan-day-date {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.plan-day-line {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.plan-day-done {
+  color: var(--good);
+}
+.plan-day-deadline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--warn);
+  font-weight: 600;
+}
+.plan-day-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.plan-day-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  background: var(--hover-bg-soft);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plan-day-item.event {
+  background: rgba(154, 123, 255, 0.12);
+}
+.plan-day-item-time {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.plan-day-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.plan-day-empty {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* ───── Plan review ───── */
+.plan-review {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───── Responsive ───── */
+@media (max-width: 1080px) {
+  .plan-week {
+    grid-template-columns: repeat(7, 180px);
+  }
+}
+@media (max-width: 900px) {
+  .plan-budget-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .plan-budget-grid {
+    grid-template-columns: 1fr;
+  }
+  .plan-tabs {
+    width: 100%;
+  }
+  .plan-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .plan-row-meta {
+    width: 100%;
+    padding-left: 56px;
+  }
+}

@@ -1,0 +1,311 @@
+/* ───── Study AI ───── */
+
+.sai-section {
+  margin-top: var(--space-4);
+}
+
+.sai-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-3);
+}
+.sai-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.sai-select {
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+}
+
+.sai-result {
+  min-height: 60px;
+}
+
+.sai-summary-text {
+  font-size: var(--text-body);
+  line-height: 1.65;
+  color: var(--label-1);
+  margin-bottom: var(--space-3);
+}
+.sai-subhead {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--label-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: var(--space-3) 0 var(--space-2);
+}
+.sai-glossary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.sai-term {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--subtle-bg);
+  border-radius: var(--r-sm);
+}
+.sai-term strong {
+  color: var(--accent);
+  font-size: 13.5px;
+}
+.sai-term span {
+  color: var(--label-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.sai-map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.sai-map-link {
+  font-size: 12.5px;
+  color: var(--label-2);
+  background: var(--accent-soft-2);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+}
+.sai-pts ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--label-2);
+  font-size: 13.5px;
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Quiz */
+.sai-quiz-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--label-3);
+  font-size: 12.5px;
+  margin-bottom: var(--space-2);
+}
+.sai-quiz-q {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  color: var(--label-1);
+  margin-bottom: var(--space-3);
+}
+.sai-quiz-opts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.sai-opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--label-1);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.sai-opt:hover:not(:disabled) {
+  background: var(--hover-bg-soft);
+  border-color: var(--line-strong);
+}
+.sai-opt:disabled {
+  cursor: default;
+}
+.sai-opt.good {
+  background: var(--good-soft);
+  border-color: var(--good);
+}
+.sai-opt.bad {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+.sai-opt-key {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--label-2);
+  flex-shrink: 0;
+}
+.sai-explain {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--r-md);
+  margin-bottom: var(--space-3);
+}
+.sai-explain.good {
+  background: var(--good-soft);
+}
+.sai-explain.bad {
+  background: var(--danger-soft);
+}
+.sai-explain strong {
+  color: var(--label-1);
+  font-size: 13.5px;
+}
+.sai-explain p {
+  margin: 2px 0 0;
+  color: var(--label-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sai-source {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--label-3);
+  font-style: italic;
+}
+.sai-actions-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+.sai-score {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.sai-score-line {
+  color: var(--label-2);
+  margin: 4px 0 var(--space-3);
+}
+
+/* Flashcards */
+.sai-card {
+  perspective: 900px;
+  position: relative;
+  margin-bottom: var(--space-3);
+}
+.sai-card-inner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  transition: transform var(--t-med) var(--ease);
+  transform-style: preserve-3d;
+}
+.sai-card.flipped .sai-card-inner {
+  transform: rotateX(180deg);
+}
+.sai-card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel-bg);
+  cursor: pointer;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.sai-face-back {
+  transform: rotateX(180deg);
+}
+.sai-face-text {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  color: var(--label-1);
+  text-align: center;
+}
+.sai-card-count {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 11.5px;
+  color: var(--label-3);
+}
+.sai-card-hint {
+  font-size: 12px;
+  color: var(--label-3);
+}
+.sai-card-count {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 11.5px;
+  color: var(--label-3);
+}
+.sai-card-hint {
+  font-size: 12px;
+  color: var(--label-3);
+}
+.sai-flash {
+  position: relative;
+}
+
+/* Ask */
+.sai-ask-res {
+  margin-top: var(--space-3);
+}
+.sai-ask-answer p {
+  color: var(--label-1);
+  line-height: 1.65;
+  margin: 0 0 var(--space-2);
+}
+.sai-cites {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.sai-cite {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--subtle-bg);
+  border-radius: var(--r-sm);
+}
+.sai-cite-snip {
+  font-size: 12.5px;
+  color: var(--label-2);
+  line-height: 1.5;
+}
+.sai-related {
+  margin-top: var(--space-3);
+  font-size: 12.5px;
+  color: var(--label-3);
+}
+
+/* Improve / Expand / Suggest */
+.sai-improve-text {
+  white-space: pre-wrap;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--label-1);
+  background: var(--subtle-bg);
+  border-radius: var(--r-md);
+  padding: var(--space-3);
+  max-height: 380px;
+  overflow: auto;
+}
