@@ -112,8 +112,11 @@ export function AIPage() {
 
   const todayEvents = events.filter((e) => e.date === today);
 
-  const pushMsg = (role: "user" | "assistant", content: string) =>
-    setAiMessages((prev) => [...prev, { id: uid("ai"), role, content, timestamp: Date.now() }]);
+  const pushMsg = (role: "user" | "assistant", content: string) => {
+    const id = uid("ai");
+    setAiMessages((prev) => [...prev, { id, role, content, timestamp: Date.now() }]);
+    return id;
+  };
 
   const streamAssistant = async (assistantId: string, prompt: string) => {
     const api = window.studentos?.ai;
@@ -152,8 +155,7 @@ export function AIPage() {
     setChatInput("");
     setAiGenerating(true);
     pushMsg("user", msg);
-    const assistantId = uid("ai");
-    pushMsg("assistant", "");
+    const assistantId = pushMsg("assistant", "");
     await streamAssistant(assistantId, msg);
   };
 
@@ -163,8 +165,7 @@ export function AIPage() {
     const prompt = buildPlanPrompt(tasks, events, goals, today);
     setAiGenerating(true);
     pushMsg("user", "Plan my day");
-    const assistantId = uid("ai");
-    pushMsg("assistant", "");
+    const assistantId = pushMsg("assistant", "");
     if (api && isModelReady) {
       await streamAssistant(assistantId, prompt);
     } else {

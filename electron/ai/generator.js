@@ -64,6 +64,10 @@ async function ensureWorker() {
       const portMatch = msg.match(/PORT:(\d+)/);
       if (portMatch) {
         _workerPort = parseInt(portMatch[1], 10);
+      }
+      // Resolve only once the model is actually loaded, not when the port is up —
+      // otherwise /health races the load and loadModel() reports "not ready".
+      if (msg.includes("PROGRESS:ready")) {
         _workerReady = true;
         mgr.markLoaded(true);
         resolve();

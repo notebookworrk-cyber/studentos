@@ -19,6 +19,7 @@
     "files": [
       "dist/**",
       "electron/**",
+      "build/icon.png",
       "package.json"
     ],
     "electronDist": "node_modules/electron/dist",
