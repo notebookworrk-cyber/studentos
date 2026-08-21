@@ -1,7 +1,7 @@
 {
   "name": "studentos",
   "private": true,
-  "version": "3.1.1",
+  "version": "3.2.0",
   "type": "module",
   "author": "Lucky (notebookworrk-cyber)",
   "description": "StudentOS — an all-in-one desktop OS for students: tasks, calendar, notes, study planner, focus timer, projects, research, terminal, browser and a local AI assistant.",
@@ -25,6 +25,13 @@
     "electronDist": "node_modules/electron/dist",
     "compression": "store",
     "artifactName": "StudentOS-Setup-${version}.${ext}",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "notebookworrk-cyber",
+        "repo": "studentos"
+      }
+    ],
     "win": {
       "icon": "build/icon.ico",
       "target": [
@@ -43,7 +50,9 @@
       {
         "from": "models",
         "to": "models",
-        "filter": ["**/*.gguf"]
+        "filter": [
+          "**/*.gguf"
+        ]
       }
     ]
   },
@@ -57,6 +66,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",
     "@google/generative-ai": "^0.24.1",
+    "electron-updater": "^6.8.9",
     "node-llama-cpp": "^3.20.0",
     "node-pty": "^1.1.0",
     "openai": "^7.4.0",

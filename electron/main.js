@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import { registerIpc, disposeIpc } from "./ipc.js";
+import { registerUpdater, disposeUpdater } from "./updater.js";
 import { BrowserManager } from "./browser.js";
 import { TerminalManager } from "./terminal.js";
 
@@ -65,6 +66,7 @@ app.whenReady().then(() => {
   browsers = new BrowserManager(win, { wsPath });
   terminals = new TerminalManager(wsPath, win);
   registerIpc(win, browsers, terminals, { isDev });
+  registerUpdater(win, { isDev });
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -77,6 +79,7 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => {
   disposeIpc();
+  disposeUpdater();
   if (browsers) browsers.dispose();
   if (terminals) terminals.dispose();
 });

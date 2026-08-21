@@ -1,0 +1,137 @@
+.update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: min(560px, calc(100vw - 48px));
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-bg-strong) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--glass-soft-line);
+  box-shadow: var(--shadow-lg);
+  animation: update-in 0.28s ease;
+}
+
+@keyframes update-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.update-banner-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.update-banner-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+}
+
+.update-banner-title svg {
+  color: var(--accent);
+}
+
+.update-banner.ready .update-banner-title svg {
+  color: var(--color-ok, #59d69a);
+}
+
+.update-banner-sub {
+  margin-top: 2px;
+  font-size: var(--text-caption);
+  color: var(--ink-3);
+}
+
+.update-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.update-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.update-modal-sub {
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-3);
+}
+
+.update-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.update-note-head {
+  margin-top: 4px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+}
+
+.update-note-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--ink-2);
+}
+
+.update-note-bullet svg {
+  margin-top: 3px;
+  color: var(--color-ok, #59d69a);
+  flex-shrink: 0;
+}
+
+.update-notes-empty {
+  font-size: var(--text-body);
+  color: var(--ink-3);
+}
+
+.update-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-line);
+}
+
+.update-size svg {
+  color: var(--accent);
+}
+
+.update-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}

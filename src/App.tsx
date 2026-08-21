@@ -8,6 +8,8 @@ import { AchievementToast } from "./components/AchievementToast";
 import { NotificationEngine } from "./components/notifications/NotificationEngine";
 import { NotificationCenter } from "./components/notifications/NotificationCenter";
 import { SessionReviewModal } from "./components/SessionReviewModal";
+import { UpdateBanner } from "./components/updater/UpdateBanner";
+import { UpdateModal } from "./components/updater/UpdateModal";
 import { Placeholder } from "./components/Placeholder";
 import { TaskDialog } from "./components/tasks/TaskDialog";
 import { EventDialog } from "./components/calendar/EventDialog";
@@ -249,6 +251,8 @@ function Shell() {
       {projectEditor && <ProjectDialog />}
       {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
       <SessionReviewModal />
+      <UpdateBanner />
+      <UpdateModal />
       <NotificationEngine />
       <Toasts />
       <AchievementToast />

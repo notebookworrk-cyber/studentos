@@ -5,6 +5,13 @@ interface StudentOSDesktop {
     diagnostics: () => Promise<Record<string, unknown>>;
     resolvePath: (payload: { name?: string; cwd?: string }) => Promise<{ path: string | null }>;
   };
+  updater: {
+    status: () => Promise<UpdateSnapshot>;
+    check: () => Promise<UpdateSnapshot>;
+    download: () => Promise<UpdateSnapshot>;
+    quitAndInstall: () => Promise<UpdateSnapshot>;
+    onEvent: (cb: (data: { event: string; state: UpdateSnapshot }) => void) => () => void;
+  };
   browser: {
     newTab: (url?: string) => Promise<string>;
     closeTab: (id: string) => Promise<boolean>;
@@ -69,6 +76,17 @@ interface BrowserNav {
   canGoBack?: boolean;
   canGoForward?: boolean;
   error?: { code: number; desc: string; url: string };
+}
+
+interface UpdateSnapshot {
+  enabled: boolean;
+  state: "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
+  channel: string;
+  version: string;
+  update: { version: string | null; notes: string | null; size: number } | null;
+  progress: { percent: number; transferred: number; total: number } | null;
+  error: string | null;
+  lastResult: "up-to-date" | "update-available" | "error" | null;
 }
 
 interface Window {

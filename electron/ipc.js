@@ -23,7 +23,7 @@ export function registerIpc(win, browsers, terminals, { isDev }) {
   };
 
   // System
-  handle("system:version", async () => ({ version: "2.0.0", electron: process.versions.electron }));
+  handle("system:version", async () => ({ version: app.getVersion(), electron: process.versions.electron }));
   handle("system:diagnostics", async () => {
     const { execFile } = await import("node:child_process");
     const { promisify } = await import("node:util");
@@ -37,7 +37,7 @@ export function registerIpc(win, browsers, terminals, { isDev }) {
     ]) {
       try { const { stdout } = await exec(cmd, args); checks[k] = stdout.trim(); } catch {}
     }
-    return { os: process.platform, arch: process.arch, version: "2.0.0", electron: process.versions.electron, ...checks };
+    return { os: process.platform, arch: process.arch, version: app.getVersion(), electron: process.versions.electron, ...checks };
   });
   // Resolve a project name / path to a real folder. Checks candidates in priority order.
   handle("system:resolvePath", async ({ name, cwd }) => {

@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npx vitest run
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Build renderer
+        run: npm run build
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tags = git tag --sort=-v:refname
+          $prev = if ($tags.Count -gt 1) { $tags[1] } else { "" }
+          $notes = if ($prev) { git log "$prev..HEAD" --oneline --no-decorate } else { git log --oneline -20 --no-decorate }
+          gh release create "$env:GITHUB_REF_NAME" --repo "${{ github.repository }}" --title "StudentOS $($env:GITHUB_REF_NAME.Substring(1))" --notes ($notes -join "`n")
+
+      - name: Build & publish installer
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --win --publish always

@@ -46,6 +46,17 @@ system: {
     diagnostics: () => invoke("system:diagnostics"),
     resolvePath: (payload) => invoke("system:resolvePath", payload),
   },
+  updater: {
+    status: () => invoke("update:status"),
+    check: () => invoke("update:check"),
+    download: () => invoke("update:download"),
+    quitAndInstall: () => invoke("update:quitAndInstall"),
+    onEvent: (cb) => {
+      const l = (_e, data) => cb(data);
+      ipcRenderer.on("update:event", l);
+      return () => ipcRenderer.removeListener("update:event", l);
+    },
+  },
   browser: {
     newTab: (url) => invoke("browser:newTab", { url }),
     closeTab: (id) => invoke("browser:closeTab", { id }),

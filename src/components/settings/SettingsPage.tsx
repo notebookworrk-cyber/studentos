@@ -6,6 +6,7 @@ import { WALLPAPERS, WALLPAPER_CATEGORIES } from "../../data/wallpapers";
 import { AISetup } from "../ai/AISetup";
 import { toast } from "../../state/toasts";
 import { exportData, importData, downloadJSON } from "../../lib/backup";
+import { ensureUpdate, checkForUpdate, quitAndInstall, useUpdate, setNotesOpen, formatSize } from "../../lib/update";
 
 const ACCENTS = [
   { id: "blue", label: "Blue", color: "#5f9dff" },
@@ -22,6 +23,11 @@ export function SettingsPage() {
   const [diag, setDiag] = useState<Record<string, unknown> | null>(null);
   const [wpCat, setWpCat] = useState<string>("all");
   const fileRef = useRef<HTMLInputElement>(null);
+  const update = useUpdate();
+
+  useEffect(() => {
+    if (isDesktop) ensureUpdate();
+  }, []);
 
   const applyImport = (raw: string) => {
     const res = importData(raw);
@@ -383,6 +389,58 @@ export function SettingsPage() {
             <span className="badge badge-tint">{aiStatus === "ready" || aiStatus === "loaded" ? "Ready" : aiStatus === "downloading" ? "Downloading" : "Not installed"}</span>
           </div>
           <AISetup />
+        </section>
+      )}
+
+      {isDesktop && (
+        <section className="study-block surface">
+          <div className="panel-head">
+            <div className="panel-title">
+              <Icon name="download" />
+              Updates
+            </div>
+            <span className="badge badge-tint">{update.channel}</span>
+          </div>
+          <div className="settings-diag">
+            <div className="settings-diag-row">
+              <span className="settings-diag-key">Current Version</span>
+              <span className="settings-diag-val">{update.version || "…"}</span>
+            </div>
+            <div className="settings-diag-row">
+              <span className="settings-diag-key">Update Channel</span>
+              <span className="settings-diag-val">{update.enabled ? "Stable" : "Unavailable (dev build)"}</span>
+            </div>
+            <div className="settings-diag-row">
+              <span className="settings-diag-key">Status</span>
+              <span className="settings-diag-val">
+                {update.state === "checking" ? "Checking for updates…" : update.state === "downloading" ? `Downloading ${update.update?.version ?? ""}${update.progress ? ` — ${update.progress.percent}%` : ""}` : update.state === "downloaded" ? `Update ${update.update?.version ?? ""} ready` : update.lastResult === "up-to-date" ? "You're up to date." : update.lastResult === "error" ? `Update check failed${update.error ? `: ${update.error}` : ""}` : update.update ? `StudentOS ${update.update.version} available` : "Idle"}
+              </span>
+            </div>
+          </div>
+          <div className="settings-row">
+            <div className="settings-row-label">
+              {update.update?.version ? `StudentOS ${update.update.version} available` : "Check GitHub for a newer version"}
+              {update.update && update.update.size > 0 && <em> — {formatSize(update.update.size)}</em>}
+            </div>
+            <div className="settings-row-actions">
+              <button className="btn btn-ghost btn-sm" onClick={checkForUpdate} disabled={update.state === "checking"}>
+                <Icon name="refresh" size={13} />
+                Check for Updates
+              </button>
+              {update.update?.version && update.state !== "downloaded" && (
+                <button className="btn btn-primary btn-sm" onClick={() => setNotesOpen(true)}>
+                  <Icon name="spark" size={13} />
+                  View Update
+                </button>
+              )}
+              {update.state === "downloaded" && (
+                <button className="btn btn-primary btn-sm" onClick={quitAndInstall}>
+                  <Icon name="refresh" size={13} />
+                  Restart &amp; Install
+                </button>
+              )}
+            </div>
+          </div>
         </section>
       )}
 
