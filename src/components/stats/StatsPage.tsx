@@ -3,6 +3,7 @@ import { useOS } from "../../state/os";
 import { xpProgressInLevel } from "../../lib/gamification/xp";
 import { ACHIEVEMENTS } from "../../lib/gamification/achievements";
 import { Icon } from "../Icon";
+import { toISO } from "../../lib/date";
 
 const RANKS = [
   { min: 0, title: "Novice", color: "var(--ink-3)" },
@@ -25,7 +26,7 @@ function rankFor(level: number) {
 type Range = "week" | "month" | "all";
 
 function dateKey(d: Date) {
-  return d.toISOString().slice(0, 10);
+  return toISO(d);
 }
 
 export function StatsPage() {

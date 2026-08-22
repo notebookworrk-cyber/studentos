@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fmtRelative } from "../../lib/date";
-import { runStudyAction } from "../../lib/studyai";
+import { runStudyAction, runStudyActionSmart } from "../../lib/studyai";
 import { useOS } from "../../state/os";
 import { NOTE_CATEGORIES } from "../../types";
 import { Icon } from "../Icon";
@@ -9,7 +9,7 @@ type SaveState = "idle" | "saving" | "saved";
 type AILabel = "improve" | "expand" | "suggest";
 
 export function NoteEditor() {
-  const { notes, subjects, folders, tasks, noteEditor, updateNote, deleteNote, closeNoteEditor } = useOS();
+  const { notes, subjects, folders, tasks, noteEditor, updateNote, deleteNote, closeNoteEditor, aiStatus } = useOS();
   const noteId = noteEditor?.mode === "edit" ? noteEditor.id : null;
   const note = notes.find((n) => n.id === noteId);
 
@@ -73,11 +73,13 @@ export function NoteEditor() {
     closeNoteEditor();
   };
 
-  const runAi = (kind: AILabel) => {
+  const runAi = async (kind: AILabel) => {
     if (aiBusy) return;
     setAiMenu(false);
     setAiBusy(kind);
-    const res = runStudyAction(kind, { notes, subjects, scope: { mode: "note", noteId: note.id } });
+    const ctx = { notes, subjects, scope: { mode: "note" as const, noteId: note.id } };
+    const modelReady = aiStatus === "ready" || aiStatus === "loaded";
+    const res = (await runStudyActionSmart(kind, ctx, undefined, modelReady)) ?? runStudyAction(kind, ctx);
     const text = "data" in res ? (res.data as { text: string }).text : "";
     updateNote(note.id, { content: text });
     setContent(text);

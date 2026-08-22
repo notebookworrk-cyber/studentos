@@ -8,6 +8,7 @@ import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const MODEL_PATH = process.env.MODEL_PATH;
+const WORKER_TOKEN = process.env.WORKER_TOKEN;
 const PORT = 0; // OS picks a free port
 
 let _llama = null;
@@ -17,8 +18,19 @@ let _sequence = null;
 let _chatSession = null;
 let _ready = false;
 
+const SYSTEM_PROMPT = "You are StudentOS AI, a helpful educational assistant. You help students with their studies, homework, and learning. Be concise, clear, and encouraging.";
+
 function log(msg) {
   process.stdout.write(`[worker] ${msg}\n`);
+}
+
+// ponytail: single stateful session — /reset clears it; per-request transcripts if quality demands
+function newSession() {
+  try { _chatSession?.dispose?.(); } catch {}
+  _chatSession = new _llama.LlamaChatSession({
+    contextSequence: _sequence,
+    systemPrompt: SYSTEM_PROMPT,
+  });
 }
 
 async function initModel() {
@@ -40,10 +52,7 @@ async function initModel() {
   _sequence = _context.getSequence();
   log("Sequence obtained. Creating chat session...");
 
-  _chatSession = new llamaCpp.LlamaChatSession({
-    contextSequence: _sequence,
-    systemPrompt: "You are StudentOS AI, a helpful educational assistant. You help students with their studies, homework, and learning. Be concise, clear, and encouraging.",
-  });
+  newSession();
 
   _ready = true;
   log("Model ready!");
@@ -63,8 +72,17 @@ function json(res, status, data) {
   res.end(body);
 }
 
+function authorized(req) {
+  return WORKER_TOKEN && req.headers.authorization === `Bearer ${WORKER_TOKEN}`;
+}
+
 const server = createServer(async (req, res) => {
   try {
+    if (!authorized(req)) {
+      res.writeHead(401);
+      return res.end();
+    }
+
     if (req.method === "GET" && req.url === "/health") {
       return json(res, 200, { ready: _ready });
     }
@@ -79,10 +97,20 @@ const server = createServer(async (req, res) => {
       return json(res, 200, { text });
     }
 
+    if (req.method === "POST" && req.url === "/reset") {
+      if (!_ready) return json(res, 503, { error: "Model not loaded" });
+      newSession();
+      log("Chat session reset");
+      return json(res, 200, { ok: true });
+    }
+
     if (req.method === "POST" && req.url === "/generate-stream") {
       if (!_ready) return json(res, 503, { error: "Model not loaded" });
       const { prompt, temperature = 0.7, maxTokens = 512 } = JSON.parse(await readBody(req));
       log(`Stream: ${prompt.slice(0, 80)}...`);
+      // Client disconnect aborts generation
+      const controller = new AbortController();
+      req.on("close", () => controller.abort());
       res.writeHead(200, {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
@@ -94,6 +122,7 @@ const server = createServer(async (req, res) => {
         await _chatSession.prompt(prompt, {
           temperature,
           maxTokens,
+          stopSignal: controller.signal,
           onTextChunk(chunk) {
             fullText += chunk;
             res.write(`data: ${JSON.stringify({ chunk })}\n\n`);

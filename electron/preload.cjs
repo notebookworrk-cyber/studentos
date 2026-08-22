@@ -89,15 +89,21 @@ system: {
     open: () => invoke("file:open"),
     autoBackup: (payload) => invoke("backup:auto", payload),
   },
-  // AI — Local model (bundled)
+  // AI — local model + cloud BYOK provider
   ai: {
     modelInfo: () => invoke("ai:modelInfo"),
     isAvailable: () => invoke("ai:isAvailable"),
     loadModel: () => invoke("ai:loadModel"),
     unloadModel: () => invoke("ai:unloadModel"),
     isLoaded: () => invoke("ai:isLoaded"),
+    getCloudStatus: () => invoke("ai:getCloudStatus"),
+    setCloudConfig: (payload) => invoke("ai:setCloudConfig", payload),
+    clearCloudConfig: () => invoke("ai:clearCloudConfig"),
+    testCloud: () => invoke("ai:testCloud"),
+    resetChat: () => invoke("ai:resetChat"),
     generate: (prompt, temperature, maxTokens) => invoke("ai:generate", { prompt, temperature, maxTokens }),
-    generateStream: (prompt, temperature, maxTokens) => invoke("ai:generateStream", { prompt, temperature, maxTokens }),
+    generateStream: (payload) => invoke("ai:generateStream", payload),
+    cancelStream: (requestId) => invoke("ai:cancelStream", { requestId }),
     test: () => invoke("ai:test"),
     onProgress: (cb) => {
       const l = (_e, data) => cb(data);

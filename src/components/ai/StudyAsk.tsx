@@ -1,19 +1,24 @@
 import { useState } from "react";
-import { runStudyAction } from "../../lib/studyai";
+import { runStudyAction, runStudyActionSmart } from "../../lib/studyai";
 import type { AskResult } from "../../lib/studyai";
 import { useOS } from "../../state/os";
 import { Icon } from "../Icon";
 
-export function StudyAsk({ notes, subjects }: { notes: ReturnType<typeof useOS>["notes"]; subjects: ReturnType<typeof useOS>["subjects"] }) {
+export function StudyAsk({ notes, subjects, modelReady = false }: { notes: ReturnType<typeof useOS>["notes"]; subjects: ReturnType<typeof useOS>["subjects"]; modelReady?: boolean }) {
   const [q, setQ] = useState("");
   const [res, setRes] = useState<AskResult | null>(null);
   const [ask, setAsk] = useState(false);
 
-  const submit = () => {
-    if (!q.trim()) return;
+  const submit = async () => {
+    if (!q.trim() || ask) return;
     setAsk(true);
-    setRes(runStudyAction("ask", { notes, subjects, scope: { mode: "all" }, length: "short" }, { question: q }).data as AskResult);
-    setAsk(false);
+    try {
+      const ctx = { notes, subjects, scope: { mode: "all" as const }, length: "short" as const };
+      const smart = await runStudyActionSmart("ask", ctx, { question: q }, modelReady);
+      setRes((smart?.data as AskResult) ?? (runStudyAction("ask", ctx, { question: q }).data as AskResult));
+    } finally {
+      setAsk(false);
+    }
   };
 
   return (

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useOS } from "../../state/os";
 import { Icon } from "../Icon";
-import { isDesktop } from "../browser/BrowserPage";
+import { isDesktop } from "../../lib/platform";
+import { todayISO } from "../../lib/date";
 import { WALLPAPERS, WALLPAPER_CATEGORIES } from "../../data/wallpapers";
 import { AISetup } from "../ai/AISetup";
+import { CloudSetup } from "../ai/CloudSetup";
 import { toast } from "../../state/toasts";
 import { exportData, importData, downloadJSON } from "../../lib/backup";
 import { ensureUpdate, checkForUpdate, quitAndInstall, useUpdate, setNotesOpen, formatSize } from "../../lib/update";
@@ -44,7 +46,7 @@ export function SettingsPage() {
     const content = JSON.stringify(env, null, 2);
     if (isDesktop && window.studentos?.files) {
       const res = await window.studentos.files.save({
-        name: `studentos-backup-${new Date().toISOString().slice(0, 10)}.json`,
+        name: `studentos-backup-${todayISO()}.json`,
         content,
       });
       if (res.ok) toast("Backup saved", "ok");
@@ -384,11 +386,12 @@ export function SettingsPage() {
           <div className="panel-head">
             <div className="panel-title">
               <Icon name="ai" />
-              Local AI Model
+              AI Assistant
             </div>
             <span className="badge badge-tint">{aiStatus === "ready" || aiStatus === "loaded" ? "Ready" : aiStatus === "downloading" ? "Downloading" : "Not installed"}</span>
           </div>
           <AISetup />
+          <CloudSetup />
         </section>
       )}
 

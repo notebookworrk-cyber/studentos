@@ -4,7 +4,7 @@ import { useOS } from "../../state/os";
 import type { PageId } from "../../types";
 import { Icon } from "../Icon";
 
-export const isDesktop = typeof window !== "undefined" && !!window.studentos?.isDesktop;
+import { isDesktop } from "../../lib/platform";
 const desktop = () => window.studentos!;
 
 type Line = { text: string; kind: "cmd" | "out" };

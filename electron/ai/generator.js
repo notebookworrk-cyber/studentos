@@ -3,6 +3,7 @@
  * requests via localhost HTTP. Sidesteps Electron ABI mismatch entirely.
  */
 import { spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getLocalModelManager } from "./localModel.js";
@@ -18,6 +19,7 @@ function nodeBin() {
 
 let _worker = null;
 let _workerPort = null;
+let _workerToken = null;
 let _workerReady = false;
 let _pendingStart = null;
 let _rejectStart = null;
@@ -45,9 +47,11 @@ async function ensureWorker() {
       workerPath = workerPath.replace(/^\/([A-Z]:)/, "$1");
     }
 
-    // Use system Node.js (not Electron's bundled Node) to avoid ABI mismatch
+    // Use system Node.js (not Electron's bundled Node) to avoid ABI mismatch.
+    // Token gates the localhost HTTP API against other local processes.
+    _workerToken = randomUUID();
     _worker = spawn(nodeBin(), [workerPath], {
-      env: { ...process.env, MODEL_PATH: modelPath },
+      env: { ...process.env, MODEL_PATH: modelPath, WORKER_TOKEN: _workerToken },
       stdio: ["pipe", "pipe", "pipe"],
     });
 
@@ -78,20 +82,22 @@ async function ensureWorker() {
       log("STDERR: " + data.toString().trim());
     });
 
-    _worker.on("error", (err) => {
-      log("Worker error: " + err.message);
-      _workerReady = false;
-      _workerPort = null;
-      _worker = null;
+  _worker.on("error", (err) => {
+    log("Worker error: " + err.message);
+    _workerReady = false;
+    _workerPort = null;
+    _workerToken = null;
+    _worker = null;
       mgr.markLoaded(false);
       reject(new Error("Worker failed to start: " + err.message));
     });
 
-    _worker.on("exit", (code) => {
-      log("Worker exited with code: " + code);
-      _workerReady = false;
-      _workerPort = null;
-      _worker = null;
+  _worker.on("exit", (code) => {
+    log("Worker exited with code: " + code);
+    _workerReady = false;
+    _workerPort = null;
+    _workerToken = null;
+    _worker = null;
       mgr.markLoaded(false);
       reject(new Error("Worker exited with code " + code + " before model ready"));
     });
@@ -114,13 +120,14 @@ async function ensureWorker() {
 async function workerRequest(path, body = null) {
   await ensureWorker();
   const url = `http://127.0.0.1:${_workerPort}${path}`;
+  const headers = { Authorization: `Bearer ${_workerToken}` };
   const opts = body
     ? {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify(body),
       }
-    : { method: "GET" };
+    : { method: "GET", headers };
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 120000); // 2min timeout
@@ -189,8 +196,9 @@ export async function generateText(prompt, opts = {}) {
 /**
  * Stream generation via SSE from the worker.
  * Calls onChunk(text) for each chunk, onDone(fullText) when complete, onError(msg) on failure.
+ * opts.signal aborts the request (worker stops generation via stopSignal).
  */
-export async function generateStream(prompt, { temperature = 0.7, maxTokens = 512, onChunk, onDone, onError }) {
+export async function generateStream(prompt, { temperature = 0.7, maxTokens = 512, signal, onChunk, onDone, onError }) {
   if (!_workerReady) {
     const loadResult = await loadModel();
     if (!loadResult.ok) { onError(loadResult.error); return; }
@@ -199,7 +207,11 @@ export async function generateStream(prompt, { temperature = 0.7, maxTokens = 51
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      signal,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${_workerToken}`,
+      },
       body: JSON.stringify({ prompt, temperature, maxTokens }),
     });
     const reader = res.body.getReader();
@@ -223,7 +235,18 @@ export async function generateStream(prompt, { temperature = 0.7, maxTokens = 51
     }
     onError("Stream ended unexpectedly");
   } catch (err) {
+    if (signal?.aborted) return; // cancelled — not an error
     onError(String(err.message || err));
+  }
+}
+
+/** Clear the worker's internal chat session so history matches the renderer. */
+export async function resetChatSession() {
+  if (!_workerReady) return;
+  try {
+    await workerRequest("/reset", {});
+  } catch (err) {
+    log("reset failed: " + err.message);
   }
 }
 

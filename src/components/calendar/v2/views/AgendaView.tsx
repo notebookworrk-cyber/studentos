@@ -1,5 +1,6 @@
 import type { CalendarItem } from "../store/useCalendarStore";
 import { EventPill } from "../ui/EventPill";
+import { parseISO } from "../../../../lib/date";
 
 export interface AgendaViewProps {
   items: CalendarItem[];
@@ -11,7 +12,7 @@ export interface AgendaViewProps {
 }
 
 function fmtDate(iso: string) {
-  const d = new Date(iso);
+  const d = parseISO(iso);
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 

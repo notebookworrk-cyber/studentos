@@ -1,3 +1,5 @@
+import { todayISO } from "./date";
+
 const APP = "studentos";
 
 export interface BackupEnvelope {
@@ -54,7 +56,7 @@ export async function downloadJSON(env: BackupEnvelope) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `studentos-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `studentos-backup-${todayISO()}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -64,7 +66,7 @@ export async function downloadJSON(env: BackupEnvelope) {
 export function maybeAutoBackup() {
   const desktop = (window as unknown as { studentos?: { files?: { autoBackup: (p: { content: string }) => Promise<unknown> } } }).studentos;
   if (!desktop?.files?.autoBackup) return;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
   if (localStorage.getItem("studentos.backup.date.v1") === today) return;
   localStorage.setItem("studentos.backup.date.v1", today);
   desktop.files.autoBackup({ content: JSON.stringify(exportData()) }).catch(() => {});

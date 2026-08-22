@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "../Icon";
 
-export const isDesktop = typeof window !== "undefined" && !!window.studentos?.isDesktop;
+import { isDesktop } from "../../lib/platform";
+
 const desktop = () => window.studentos!;
 
 type Tab = {

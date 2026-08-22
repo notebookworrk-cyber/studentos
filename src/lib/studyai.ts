@@ -359,3 +359,223 @@ export function runStudyAction(
     }
   }
 }
+
+// ---- LLM-backed study intelligence: same result types, heuristic fallback ----
+
+const LLM_NOTES_CAP = 4000;
+
+function scopedText(ctx: StudyAICtx, cap = LLM_NOTES_CAP): string {
+  const items = scopeNotes(ctx);
+  const parts: string[] = [];
+  let used = 0;
+  for (const { note } of items) {
+    const block = `## ${note.title}\n${note.content}`;
+    if (used + block.length > cap && parts.length > 0) break;
+    parts.push(block);
+    used += block.length;
+  }
+  return parts.join("\n\n");
+}
+
+function extractJson(raw: string): unknown {
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const body = fenced ? fenced[1] : raw;
+  const start = body.indexOf("{");
+  const end = body.lastIndexOf("}");
+  if (start === -1 || end <= start) return null;
+  try {
+    return JSON.parse(body.slice(start, end + 1));
+  } catch {
+    return null;
+  }
+}
+
+async function llmText(prompt: string, modelReady: boolean): Promise<string | null> {
+  const api = window.studentos?.ai;
+  if (!api) return null;
+  let ready = modelReady;
+  if (!ready) {
+    try {
+      ready = (await api.getCloudStatus()).configured;
+    } catch {
+      /* status unavailable — treat as not ready */
+    }
+  }
+  if (!ready) return null;
+  try {
+    const res = await api.generate(prompt, 0.4, 1600);
+    if (res?.error || !res?.text?.trim()) return null;
+    return res.text;
+  } catch {
+    return null;
+  }
+}
+
+async function summarizeSmart(ctx: StudyAICtx, modelReady: boolean): Promise<SummaryResult | null> {
+  const length = ctx.length ?? "short";
+  const raw = await llmText(
+    [
+      "You are a study assistant. Summarize the student's notes.",
+      "Reply with STRICT JSON only — no prose outside JSON:",
+      '{"summary": string, "keyTerms": [{"term": string, "meaning": string}], "studyPoints": [string], "actionItems": [string], "conceptMap": [{"from": string, "to": string}]}',
+      length === "tldr" ? "Keep summary to one sentence." : length === "detailed" ? "Be thorough." : "Keep summary to a short paragraph.",
+      "conceptMap entries may include an optional \"label\".",
+      "",
+      scopedText(ctx),
+    ].join("\n"),
+    modelReady,
+  );
+  if (!raw) return null;
+  const j = extractJson(raw) as Partial<SummaryResult> | null;
+  if (!j || typeof j.summary !== "string" || !j.summary.trim()) return null;
+  const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+  return {
+    length,
+    summary: j.summary,
+    keyTerms: arr<{ term: string; meaning: string }>(j.keyTerms).filter((k) => k?.term),
+    studyPoints: arr<string>(j.studyPoints).filter(Boolean),
+    actionItems: arr<string>(j.actionItems).filter(Boolean),
+    conceptMap: arr<{ from: string; to: string; label?: string }>(j.conceptMap)
+      .filter((c) => c?.from && c?.to)
+      .map((c) => ({ from: c.from, to: c.to, label: c.label ?? "relates to" })),
+  };
+}
+
+async function quizSmart(ctx: StudyAICtx, modelReady: boolean): Promise<QuizResult | null> {
+  const raw = await llmText(
+    [
+      "You are a quiz generator for a student. Generate 5-8 questions from the notes below.",
+      'Mix "mcq" (4 options) and "truefalse" (options exactly ["True","False"]).',
+      "Reply with STRICT JSON only:",
+      '{"title": string, "questions": [{"type": "mcq"|"truefalse", "question": string, "options": [string], "answer": number, "explanation": string, "sourceNote": string}]}',
+      '"answer" is the 0-based index of the correct option. "sourceNote" is the note title it came from.',
+      "",
+      scopedText(ctx),
+    ].join("\n"),
+    modelReady,
+  );
+  if (!raw) return null;
+  const j = extractJson(raw) as { title?: unknown; questions?: unknown } | null;
+  if (!j || !Array.isArray(j.questions)) return null;
+  const questions: QuizQuestion[] = [];
+  for (const q of j.questions) {
+    const qq = q as Partial<QuizQuestion>;
+    if (typeof qq.question !== "string" || !Array.isArray(qq.options)) continue;
+    const answer = typeof qq.answer === "number" ? Math.trunc(qq.answer) : -1;
+    if (answer < 0 || answer >= qq.options.length) continue;
+    questions.push({
+      type: qq.type === "truefalse" ? "truefalse" : "mcq",
+      question: qq.question,
+      options: qq.options.map(String),
+      answer,
+      explanation: typeof qq.explanation === "string" ? qq.explanation : "",
+      sourceNote: typeof qq.sourceNote === "string" ? qq.sourceNote : "AI",
+    });
+  }
+  if (!questions.length) return null;
+  return { title: typeof j.title === "string" && j.title ? j.title : "Study Quiz", questions };
+}
+
+async function flashcardsSmart(ctx: StudyAICtx, modelReady: boolean): Promise<FlashcardResult | null> {
+  const raw = await llmText(
+    [
+      "You are a flashcard generator for a student. Create 6-10 cards from the notes below.",
+      "Fronts are questions or terms; backs are precise answers grounded in the notes.",
+      "Reply with STRICT JSON only:",
+      '{"title": string, "cards": [{"front": string, "back": string, "source": string}]}',
+      "",
+      scopedText(ctx),
+    ].join("\n"),
+    modelReady,
+  );
+  if (!raw) return null;
+  const j = extractJson(raw) as { title?: unknown; cards?: unknown } | null;
+  if (!j || !Array.isArray(j.cards)) return null;
+  const cards: Flashcard[] = [];
+  for (const c of j.cards) {
+    const cc = c as Partial<Flashcard>;
+    if (typeof cc.front !== "string" || typeof cc.back !== "string") continue;
+    cards.push({
+      id: `fc-llm-${cards.length}`,
+      front: cc.front,
+      back: cc.back,
+      source: typeof cc.source === "string" && cc.source ? cc.source : "AI",
+    });
+  }
+  if (!cards.length) return null;
+  return { title: typeof j.title === "string" && j.title ? j.title : "Study Flashcards", cards };
+}
+
+async function askSmart(ctx: StudyAICtx, question: string, modelReady: boolean): Promise<AskResult | null> {
+  if (!question.trim()) return null;
+  // Citations stay heuristic (keyword match) so they always point at real note text.
+  const grounded = ask(ctx, question);
+  const raw = await llmText(
+    [
+      "You are a study assistant answering from the student's notes. Cite note titles inline like [note title].",
+      "If the notes don't cover the question, say so briefly and answer from general knowledge.",
+      "",
+      `Notes:\n${scopedText(ctx)}`,
+      "",
+      `Question: ${question}`,
+    ].join("\n"),
+    modelReady,
+  );
+  if (!raw) return null;
+  return { ...grounded, answer: raw.trim() };
+}
+
+async function noteToolSmart(kind: "improve" | "expand" | "suggest", note: Note, ctx: StudyAICtx, modelReady: boolean): Promise<string | null> {
+  const instruction =
+    kind === "improve"
+      ? "Rewrite the note with clear structure (## Overview, ## Key points, ## Action with checklist items). Keep it faithful to the original."
+      : kind === "expand"
+        ? "Expand the note: fill gaps, add missing explanations and an ## Open questions section. Stay on topic."
+        : "Suggest how to study this material: tags, linked concepts, and next actions.";
+  return llmText(
+    [
+      `You are a study-notes assistant. ${instruction}`,
+      "Reply in clean markdown only.",
+      "",
+      `# ${note.title}\n${note.content}`,
+      "",
+      `Subject context: ${ctx.subjects.find((s) => s.folder === note.folder)?.name ?? "General"}.`,
+    ].join("\n"),
+    modelReady,
+  );
+}
+
+export async function runStudyActionSmart(
+  kind: StudyAIKind,
+  ctx: StudyAICtx,
+  extra?: { question?: string; noteId?: string },
+  modelReady = false,
+): Promise<StudyAIResult | null> {
+  const noteId = extra?.noteId ?? (ctx.scope as { noteId?: string }).noteId;
+  switch (kind) {
+    case "summarize": {
+      const data = await summarizeSmart(ctx, modelReady);
+      return data ? { kind, data } : null;
+    }
+    case "quiz": {
+      const data = await quizSmart(ctx, modelReady);
+      return data ? { kind, data } : null;
+    }
+    case "flashcards": {
+      const data = await flashcardsSmart(ctx, modelReady);
+      return data ? { kind, data } : null;
+    }
+    case "ask": {
+      const data = await askSmart(ctx, extra?.question ?? "", modelReady);
+      return data ? { kind, data } : null;
+    }
+    case "improve":
+    case "expand":
+    case "suggest": {
+      const note = ctx.notes.find((n) => n.id === noteId);
+      if (!note) return null;
+      const text = await noteToolSmart(kind, note, ctx, modelReady);
+      return text ? { kind, data: { text, noteId: note.id } } : null;
+    }
+  }
+}

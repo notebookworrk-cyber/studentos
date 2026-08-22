@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getIntent, setIntent } from "../../lib/aiIntent";
-import { runStudyAction } from "../../lib/studyai";
-import type { StudyAICtx, StudyAIKind, StudyAIScope, SummaryLength, SummaryResult } from "../../lib/studyai";
+import { runStudyAction, runStudyActionSmart } from "../../lib/studyai";
+import type { StudyAICtx, StudyAIKind, StudyAIResult, StudyAIScope, SummaryLength, SummaryResult } from "../../lib/studyai";
 import { useOS } from "../../state/os";
 import { Icon } from "../Icon";
 import { StudyAsk } from "./StudyAsk";
@@ -16,12 +16,15 @@ const ACTIONS: { id: StudyAIKind; label: string; icon: string }[] = [
 ];
 
 export function StudyAISection() {
-  const { notes, subjects, navigate, addReviewCards, addSavedQuiz } = useOS();
+  const { notes, subjects, navigate, addReviewCards, addSavedQuiz, aiStatus } = useOS();
 
   const [scope, setScope] = useState<StudyAIScope>({ mode: "all" });
   const [action, setAction] = useState<StudyAIKind>("summarize");
   const [length, setLength] = useState<SummaryLength>("short");
-  const [result, setResult] = useState<ReturnType<typeof runStudyAction> | null>(null);
+  const [result, setResult] = useState<StudyAIResult | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
+
+  const modelReady = aiStatus === "ready" || aiStatus === "loaded";
 
   useEffect(() => {
     const intent = getIntent();
@@ -37,13 +40,23 @@ export function StudyAISection() {
 
   const ctx: StudyAICtx = useMemo(() => ({ notes, subjects, scope, length }), [notes, subjects, scope, length]);
 
+  const runWithLLM = async (kind: StudyAIKind, s: StudyAIScope, len?: SummaryLength) => {
+    setAiBusy(true);
+    try {
+      const c: StudyAICtx = { ...ctx, scope: s, length: kind === "summarize" ? (len ?? length) : undefined };
+      setResult(await runStudyActionSmart(kind, c, {}, modelReady).then((r) => r ?? runStudyAction(kind, c, {})));
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
   const runIntent = (kind: StudyAIKind, s: StudyAIScope) => {
-    setResult(runStudyAction(kind, { ...ctx, scope: s, length: kind === "summarize" ? length : undefined }, {}));
+    void runWithLLM(kind, s);
   };
 
   const run = (kind: StudyAIKind) => {
     setAction(kind);
-    setResult(runStudyAction(kind, { ...ctx, scope, length: kind === "summarize" ? length : undefined }, {}));
+    void runWithLLM(kind, scope);
   };
 
   const folders = useMemo(() => [...new Set(notes.map((n) => n.folder).filter(Boolean))], [notes]);
@@ -105,7 +118,7 @@ export function StudyAISection() {
             <span className="field-label">Length</span>
             <div className="seg">
               {(["tldr", "short", "detailed"] as SummaryLength[]).map((l) => (
-                <button key={l} className={`seg-item ${length === l ? "active" : ""}`} onClick={() => { setLength(l); setResult(runStudyAction("summarize", { ...ctx, scope, length: l }, {})); }}>
+                <button key={l} className={`seg-item ${length === l ? "active" : ""}`} onClick={() => { setLength(l); void runWithLLM("summarize", scope, l); }}>
                   {l === "tldr" ? "TL;DR" : l === "short" ? "Short" : "Detailed"}
                 </button>
               ))}
@@ -115,13 +128,19 @@ export function StudyAISection() {
       </div>
 
       <div className="sai-result">
-        {!result && (
+        {aiBusy && (
+          <div className="sai-busy">
+            <Icon name="spark" size={14} />
+            Thinking…
+          </div>
+        )}
+        {!result && !aiBusy && (
           <p className="study-res-empty">Pick an action to generate study material from your notes. Works fully offline.</p>
         )}
         {result?.kind === "summarize" && <SummaryView r={result.data} />}
         {result?.kind === "quiz" && <StudyQuiz result={result.data} onSave={addSavedQuiz} />}
         {result?.kind === "flashcards" && <StudyFlashcards result={result.data} onGrade={(c) => addReviewCards([{ ...c, box: 1, dueAt: Date.now(), lastGradedAt: Date.now() }])} />}
-        {result?.kind === "ask" && <StudyAsk notes={notes} subjects={subjects} />}
+        {result?.kind === "ask" && <StudyAsk notes={notes} subjects={subjects} modelReady={modelReady} />}
         {result && (result.kind === "improve" || result.kind === "expand" || result.kind === "suggest") && (
           <div className="sai-improve">
             <pre className="sai-improve-text">{result.data.text}</pre>

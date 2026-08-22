@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useOS } from "../../state/os";
+import { todayISO } from "../../lib/date";
 import { notify, rememberFired, wasFired } from "../../lib/notifications";
 import type { CalendarEvent, Task, PlanItem, UpcomingItem } from "../../types";
 import type { ReviewCard } from "../../lib/srs";
@@ -29,7 +30,7 @@ function checkEvents(events: CalendarEvent[]) {
 
 function checkTasks(tasks: Task[]) {
   const now = Date.now();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
   for (const t of tasks) {
     if (t.status === "completed" || t.date !== today || !t.startTime) continue;
     const start = atMs(t.date, t.startTime);
@@ -43,7 +44,7 @@ function checkTasks(tasks: Task[]) {
 }
 
 function checkReviews(dueReviews: ReviewCard[]) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
   const key = `reviews-${today}`;
   if (dueReviews.length === 0 || wasFired(key)) return;
   rememberFired(key);
@@ -51,7 +52,7 @@ function checkReviews(dueReviews: ReviewCard[]) {
 }
 
 function checkDigest(plan: PlanItem[], overdue: Task[], upcoming: UpcomingItem[]) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
   const key = `digest-${today}`;
   if (wasFired(key)) return;
   rememberFired(key);

@@ -29,9 +29,9 @@ import type {
   Task,
   UpcomingItem,
 } from "../types";
-import { xpForTask, levelForXP } from "../lib/gamification/xp";
-import { updateStreak } from "../lib/gamification/streaks";
-import { checkAllAchievements } from "../lib/gamification/achievements";
+import { xpForTask } from "../lib/gamification/xp";
+import { awardXP, initialGamificationState } from "../lib/gamification/award";
+import { usePersistedState } from "./persisted";
 import { notify } from "../lib/notifications";
 
 export const FOCUS_LEN = 25 * 60;
@@ -77,16 +77,6 @@ function systemTheme(): Theme {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
-}
-
-function loadState<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) return JSON.parse(raw) as T;
-  } catch {
-    /* ignore corrupt storage */
-  }
-  return fallback;
 }
 
 export function uid(prefix: string): string {
@@ -295,43 +285,40 @@ function buildUpcoming(tasks: Task[], events: CalendarEvent[], today: string): U
 
 export function OSProvider({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<PageId>("home");
-  const [wallpaper, setWallpaper] = useState(() => {
-    const saved = localStorage.getItem(WALLPAPER_KEY);
-    return WALLPAPERS.some((w) => w.id === saved) ? (saved as string) : "dawn";
+  const [wallpaper, setWallpaper] = usePersistedState<string>(WALLPAPER_KEY, "dawn", {
+    parse: (r) => (WALLPAPERS.some((w) => w.id === r) ? r : "dawn"),
+    serialize: (v) => v,
   });
-  const [wallpaperOpacity, setWallpaperOpacity] = useState(() => {
-    const n = parseFloat(localStorage.getItem("studentos.wallpaperOpacity.v1") ?? "");
-    return Number.isFinite(n) ? n : 100;
+  const [wallpaperOpacity, setWallpaperOpacity] = usePersistedState<number>("studentos.wallpaperOpacity.v1", 100, {
+    parse: (r) => { const n = parseFloat(r); return Number.isFinite(n) ? n : 100; },
+    serialize: (n) => String(n),
   });
-  const [wallpaperDim, setWallpaperDim] = useState(() => {
-    const n = parseFloat(localStorage.getItem("studentos.wallpaperDim.v1") ?? "");
-    return Number.isFinite(n) ? n : 12;
+  const [wallpaperDim, setWallpaperDim] = usePersistedState<number>("studentos.wallpaperDim.v1", 12, {
+    parse: (r) => { const n = parseFloat(r); return Number.isFinite(n) ? n : 12; },
+    serialize: (n) => String(n),
   });
-  const [wallpaperBlur, setWallpaperBlur] = useState(() => {
-    const n = parseFloat(localStorage.getItem("studentos.wallpaperBlur.v1") ?? "");
-    return Number.isFinite(n) ? n : 0;
+  const [wallpaperBlur, setWallpaperBlur] = usePersistedState<number>("studentos.wallpaperBlur.v1", 0, {
+    parse: (r) => { const n = parseFloat(r); return Number.isFinite(n) ? n : 0; },
+    serialize: (n) => String(n),
   });
-  const [wallpaperFavorites, setWallpaperFavorites] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem("studentos.wallpaperFav.v1") ?? "[]"); }
-    catch { return []; }
+  const [wallpaperFavorites, setWallpaperFavorites] = usePersistedState<string[]>("studentos.wallpaperFav.v1", []);
+  const [wallpaperRecent, setWallpaperRecent] = usePersistedState<string[]>("studentos.wallpaperRecent.v1", []);
+  const [dynamicAtmosphere, setDynamicAtmosphere] = usePersistedState<boolean>("studentos.wallpaperDynamic.v1", false, {
+    parse: (r) => r === "1",
+    serialize: (b) => (b ? "1" : "0"),
   });
-  const [wallpaperRecent, setWallpaperRecent] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem("studentos.wallpaperRecent.v1") ?? "[]"); }
-    catch { return []; }
+  const [autoChange, setAutoChange] = usePersistedState<"never" | "daily" | "startup">("studentos.wallpaperAuto.v1", "never", {
+    parse: (r) => (r === "daily" || r === "startup" ? r : "never"),
+    serialize: (v) => v,
   });
-  const [dynamicAtmosphere, setDynamicAtmosphere] = useState(() => localStorage.getItem("studentos.wallpaperDynamic.v1") === "1");
-  const [autoChange, setAutoChange] = useState<"never" | "daily" | "startup">(() => {
-    const v = localStorage.getItem("studentos.wallpaperAuto.v1");
-    return v === "daily" || v === "startup" ? v : "never";
+  const [theme, setTheme] = usePersistedState<Theme>(THEME_KEY, systemTheme(), {
+    parse: (r) => (r === "light" || r === "dark" ? r : systemTheme()),
+    serialize: (t) => t,
   });
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem(THEME_KEY);
-    return saved === "light" || saved === "dark" ? saved : systemTheme();
-  });
-  const [tasks, setTasks] = useState<Task[]>(() => loadState(TASKS_KEY, seedTasks));
-  const [events, setEvents] = useState<CalendarEvent[]>(() => loadState(EVENTS_KEY, seedEvents));
-  const [notes, setNotes] = useState<Note[]>(() => loadState(NOTES_KEY, seedNotes));
-  const [folders, setFolders] = useState<string[]>(() => loadState(FOLDERS_KEY, seedFolders));
+  const [tasks, setTasks] = usePersistedState<Task[]>(TASKS_KEY, seedTasks);
+  const [events, setEvents] = usePersistedState<CalendarEvent[]>(EVENTS_KEY, seedEvents);
+  const [notes, setNotes] = usePersistedState<Note[]>(NOTES_KEY, seedNotes);
+  const [folders, setFolders] = usePersistedState<string[]>(FOLDERS_KEY, seedFolders);
   const [seconds, setSeconds] = useState(FOCUS_LEN);
   const [running, setRunning] = useState(false);
   const [session, setSession] = useState(1);
@@ -342,174 +329,47 @@ export function OSProvider({ children }: { children: ReactNode }) {
   const [breakLen, setBreakLen] = useState(BREAK_LEN / 60);
   const [composer, setComposer] = useState<Composer>(null);
   const [noteEditor, setNoteEditor] = useState<NoteEditor>(null);
-  const [subjects, setSubjects] = useState<StudySubject[]>(() => loadState(SUBJECTS_KEY, seedSubjects));
-  const [sessions, setSessions] = useState<StudySession[]>(() => loadState(SESSIONS_KEY, seedSessions));
-  const [studySubjectId, setStudySubjectId] = useState<string>(() => loadState(SUBJECT_KEY, "bio"));
-  const [studyFocus, setStudyFocus] = useState<StudyFocus | null>(() => loadState(FOCUS_KEY, null));
-  const [focusedSec, setFocusedSec] = useState(0);
-  const [goals, setGoals] = useState<Goal[]>(() => loadState(GOALS_KEY, seedGoals));
-  const [goalEditor, setGoalEditor] = useState<GoalEditor>(null);
-  const [lockinSessions, setLockinSessions] = useState<LockInSession[]>(() =>
-    loadState(LOCKIN_KEY, []),
-  );
-  const [reviewCards, setReviewCards] = useState<ReviewCard[]>(() => loadState(REVIEW_KEY, []));
-  const [studyMaterials, setStudyMaterials] = useState<StudyMaterial[]>(() => loadState(STUDY_MATERIALS_KEY, []));
-  const [savedQuizzes, setSavedQuizzes] = useState<SavedQuiz[]>(() => loadState(QUIZ_KEY, []));
-  const [gamification, setGamification] = useState<GamificationState>(() => loadState(GAMIFICATION_KEY, {
-    xp: 0, level: 1, currentStreak: 0, longestStreak: 0, lastActiveDate: null, totalActiveDays: 0,
-    achievements: [], totalTasksCompleted: 0, totalStudyMinutes: 0, totalLockInMinutes: 0,
-    totalQuizzesCompleted: 0, totalQuizCorrect: 0, totalCardsReviewed: 0, weeklyXP: {},
-  }));
-  const [aiStatus, setAiStatus] = useState<AIStatus>(() => {
-    const v = loadState(AI_KEY, "not_installed") as AIStatus;
-    return v === "loading" ? "not_installed" : v;
+  const [subjects, setSubjects] = usePersistedState<StudySubject[]>(SUBJECTS_KEY, seedSubjects);
+  const [sessions, setSessions] = usePersistedState<StudySession[]>(SESSIONS_KEY, seedSessions);
+  const [studySubjectId, setStudySubjectId] = usePersistedState<string>(SUBJECT_KEY, "bio");
+  const [studyFocus, setStudyFocus] = usePersistedState<StudyFocus | null>(FOCUS_KEY, null, {
+    serialize: (f) => (f ? JSON.stringify(f) : null),
   });
-  const [aiMessages, setAiMessages] = useState<AIMessage[]>(() => loadState(AI_MESSAGES_KEY, []));
+  const [focusedSec, setFocusedSec] = useState(0);
+  const [goals, setGoals] = usePersistedState<Goal[]>(GOALS_KEY, seedGoals);
+  const [goalEditor, setGoalEditor] = useState<GoalEditor>(null);
+  const [lockinSessions, setLockinSessions] = usePersistedState<LockInSession[]>(LOCKIN_KEY, []);
+  const [reviewCards, setReviewCards] = usePersistedState<ReviewCard[]>(REVIEW_KEY, []);
+  const [studyMaterials, setStudyMaterials] = usePersistedState<StudyMaterial[]>(STUDY_MATERIALS_KEY, []);
+  const [savedQuizzes, setSavedQuizzes] = usePersistedState<SavedQuiz[]>(QUIZ_KEY, []);
+  const [gamification, setGamification] = usePersistedState<GamificationState>(GAMIFICATION_KEY, initialGamificationState);
+  const [aiStatus, setAiStatus] = usePersistedState<AIStatus>(AI_KEY, "not_installed", {
+    parse: (r) => {
+      try { const v = JSON.parse(r) as AIStatus; return v === "loading" ? "not_installed" : v; }
+      catch { return "not_installed"; }
+    },
+    serialize: (s) => (s === "loading" ? null : JSON.stringify(s)),
+  });
+  const [aiMessages, setAiMessages] = usePersistedState<AIMessage[]>(AI_MESSAGES_KEY, [], {
+    // Cap at 200 messages (100 exchanges) to avoid localStorage bloat
+    serialize: (m) => JSON.stringify(m.length > 200 ? m.slice(-200) : m),
+  });
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiLoadProgress, setAiLoadProgress] = useState<{ phase: string; percent: number } | null>(null);
-  const [projects, setProjects] = useState<Project[]>(() => loadState(PROJECTS_KEY, seedProjects));
+  const [projects, setProjects] = usePersistedState<Project[]>(PROJECTS_KEY, seedProjects);
   const [projectEditor, setProjectEditor] = useState<ProjectEditor>(null);
-  const [profileName, setProfileName] = useState<string>(() => loadState(PROFILE_KEY, "Lucky"));
-  const [accent, setAccent] = useState<string>(() => loadState(ACCENT_KEY, "blue"));
-  const [quotesEnabled, setQuotesEnabled] = useState<boolean>(() => loadState(QUOTES_KEY, true));
-  const [location, setLocation] = useState<{ city: string; lat: number; lon: number } | null>(() => loadState(LOCATION_KEY, null));
-  const [clock24h, setClock24h] = useState<boolean>(() => loadState(CLOCK24H_KEY, true));
-  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => localStorage.getItem("studentos.notificationsEnabled.v1") !== "0");
+  const [profileName, setProfileName] = usePersistedState<string>(PROFILE_KEY, "Lucky");
+  const [accent, setAccent] = usePersistedState<string>(ACCENT_KEY, "blue");
+  const [quotesEnabled, setQuotesEnabled] = usePersistedState<boolean>(QUOTES_KEY, true);
+  const [location, setLocation] = usePersistedState<{ city: string; lat: number; lon: number } | null>(LOCATION_KEY, null, {
+    serialize: (l) => (l ? JSON.stringify(l) : null),
+  });
+  const [clock24h, setClock24h] = usePersistedState<boolean>(CLOCK24H_KEY, true);
+  const [notificationsEnabled, setNotificationsEnabled] = usePersistedState<boolean>("studentos.notificationsEnabled.v1", true, {
+    parse: (r) => r !== "0",
+    serialize: (b) => (b ? "1" : "0"),
+  });
   const [sessionReview, setSessionReview] = useState<{ kind: "study" | "lockin"; id: string } | null>(null);
-
-  useEffect(() => {
-    localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
-  }, [tasks]);
-
-  useEffect(() => {
-    localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
-  }, [events]);
-
-  useEffect(() => {
-    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
-  }, [notes]);
-
-  useEffect(() => {
-    localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
-  }, [folders]);
-
-  useEffect(() => {
-    localStorage.setItem(SUBJECTS_KEY, JSON.stringify(subjects));
-  }, [subjects]);
-
-  useEffect(() => {
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
-  }, [sessions]);
-
-  useEffect(() => {
-    localStorage.setItem(SUBJECT_KEY, JSON.stringify(studySubjectId));
-  }, [studySubjectId]);
-
-  useEffect(() => {
-    if (studyFocus) localStorage.setItem(FOCUS_KEY, JSON.stringify(studyFocus));
-    else localStorage.removeItem(FOCUS_KEY);
-  }, [studyFocus]);
-
-  useEffect(() => {
-    localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
-  }, [goals]);
-
-  useEffect(() => {
-    localStorage.setItem(LOCKIN_KEY, JSON.stringify(lockinSessions));
-  }, [lockinSessions]);
-
-  useEffect(() => {
-    localStorage.setItem(WALLPAPER_KEY, wallpaper);
-  }, [wallpaper]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperOpacity.v1", String(wallpaperOpacity));
-  }, [wallpaperOpacity]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperDim.v1", String(wallpaperDim));
-  }, [wallpaperDim]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperBlur.v1", String(wallpaperBlur));
-  }, [wallpaperBlur]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperFav.v1", JSON.stringify(wallpaperFavorites));
-  }, [wallpaperFavorites]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperRecent.v1", JSON.stringify(wallpaperRecent));
-  }, [wallpaperRecent]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperDynamic.v1", dynamicAtmosphere ? "1" : "0");
-  }, [dynamicAtmosphere]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.wallpaperAuto.v1", autoChange);
-  }, [autoChange]);
-
-  useEffect(() => {
-    localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem(REVIEW_KEY, JSON.stringify(reviewCards));
-  }, [reviewCards]);
-
-  useEffect(() => {
-    localStorage.setItem(STUDY_MATERIALS_KEY, JSON.stringify(studyMaterials));
-  }, [studyMaterials]);
-
-  useEffect(() => {
-    localStorage.setItem(QUIZ_KEY, JSON.stringify(savedQuizzes));
-  }, [savedQuizzes]);
-
-  useEffect(() => {
-    localStorage.setItem(GAMIFICATION_KEY, JSON.stringify(gamification));
-  }, [gamification]);
-
-  useEffect(() => {
-    if (aiStatus !== "loading") {
-      localStorage.setItem(AI_KEY, JSON.stringify(aiStatus));
-    }
-  }, [aiStatus]);
-
-  useEffect(() => {
-    // Cap at 200 messages (100 exchanges) to avoid localStorage bloat
-    const capped = aiMessages.length > 200 ? aiMessages.slice(-200) : aiMessages;
-    localStorage.setItem(AI_MESSAGES_KEY, JSON.stringify(capped));
-  }, [aiMessages]);
-
-  useEffect(() => {
-    localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
-  }, [projects]);
-
-  useEffect(() => {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profileName));
-  }, [profileName]);
-
-  useEffect(() => {
-    localStorage.setItem(ACCENT_KEY, JSON.stringify(accent));
-  }, [accent]);
-
-  useEffect(() => {
-    localStorage.setItem(QUOTES_KEY, JSON.stringify(quotesEnabled));
-  }, [quotesEnabled]);
-
-  useEffect(() => {
-    if (location) localStorage.setItem(LOCATION_KEY, JSON.stringify(location));
-    else localStorage.removeItem(LOCATION_KEY);
-  }, [location]);
-
-  useEffect(() => {
-    localStorage.setItem(CLOCK24H_KEY, JSON.stringify(clock24h));
-  }, [clock24h]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos.notificationsEnabled.v1", notificationsEnabled ? "1" : "0");
-  }, [notificationsEnabled]);
 
   useEffect(() => {
     if (!running) return;
@@ -585,17 +445,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
       );
       if (!wasCompleted) {
         const xp = xpForTask(task.priority);
-        setGamification((g) => {
-          let ng = { ...g, xp: g.xp + xp, totalTasksCompleted: g.totalTasksCompleted + 1 };
-          ng = { ...ng, ...updateStreak(ng.lastActiveDate, ng.currentStreak, ng.longestStreak, ng.totalActiveDays) };
-          const newLevel = levelForXP(ng.xp);
-          ng.level = newLevel;
-          const todayKey = todayISO();
-          ng.weeklyXP = { ...ng.weeklyXP, [todayKey]: (ng.weeklyXP[todayKey] || 0) + xp };
-          const unlocked = checkAllAchievements(ng);
-          if (unlocked.length) ng.achievements = [...ng.achievements, ...unlocked];
-          return ng;
-        });
+        setGamification((g) => awardXP(g, xp, { totalTasksCompleted: 1 }));
       }
       return updated;
     });
@@ -807,16 +657,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
     setFocusedSec(0);
     setSessionReview({ kind: "study", id: session.id });
     const xp = 15 * Math.ceil(session.focusedMinutes / 25);
-    setGamification((prev) => {
-      let g = { ...prev, xp: prev.xp + xp, totalStudyMinutes: prev.totalStudyMinutes + session.focusedMinutes };
-      g = { ...g, ...updateStreak(g.lastActiveDate, g.currentStreak, g.longestStreak, g.totalActiveDays) };
-      g.level = levelForXP(g.xp);
-      const todayKey = todayISO();
-      g.weeklyXP = { ...g.weeklyXP, [todayKey]: (g.weeklyXP[todayKey] || 0) + xp };
-      const unlocked = checkAllAchievements(g);
-      if (unlocked.length) g.achievements = [...g.achievements, ...unlocked];
-      return g;
-    });
+    setGamification((prev) => awardXP(prev, xp, { totalStudyMinutes: session.focusedMinutes }));
     return session;
   };
 
@@ -866,17 +707,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
     setSession(1);
     setFocusLen(FOCUS_LEN);
     if (completed) {
-      const xp = 20;
-      setGamification((prev) => {
-        let g = { ...prev, xp: prev.xp + xp, totalLockInMinutes: prev.totalLockInMinutes + focusedMin };
-        g = { ...g, ...updateStreak(g.lastActiveDate, g.currentStreak, g.longestStreak, g.totalActiveDays) };
-        g.level = levelForXP(g.xp);
-        const todayKey = todayISO();
-        g.weeklyXP = { ...g.weeklyXP, [todayKey]: (g.weeklyXP[todayKey] || 0) + xp };
-        const unlocked = checkAllAchievements(g);
-        if (unlocked.length) g.achievements = [...g.achievements, ...unlocked];
-        return g;
-      });
+      setGamification((prev) => awardXP(prev, 20, { totalLockInMinutes: focusedMin }));
     }
   };
 
@@ -911,11 +742,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
     setSeconds(FOCUS_LEN);
     setFocusedSec(0);
     setRunning(false);
-    setGamification({
-      xp: 0, level: 1, currentStreak: 0, longestStreak: 0, lastActiveDate: null, totalActiveDays: 0,
-      achievements: [], totalTasksCompleted: 0, totalStudyMinutes: 0, totalLockInMinutes: 0,
-      totalQuizzesCompleted: 0, totalQuizCorrect: 0, totalCardsReviewed: 0, weeklyXP: {},
-    });
+    setGamification(initialGamificationState);
     setAiStatus("not_installed");
     setAiMessages([]);
     setAiGenerating(false);
@@ -1009,34 +836,14 @@ export function OSProvider({ children }: { children: ReactNode }) {
     addReviewCards: (fresh: ReviewCard[]) => setReviewCards((prev) => mergeDeck(prev, fresh)),
     gradeReview: (id: string, grade: 0 | 1 | 2 | 3 | 4) => {
       setReviewCards((prev) => prev.map((c) => (c.id === id ? gradeCard(c, grade) : c)));
-      const xp = 2;
-      setGamification((prev) => {
-        let g = { ...prev, xp: prev.xp + xp, totalCardsReviewed: prev.totalCardsReviewed + 1 };
-        g = { ...g, ...updateStreak(g.lastActiveDate, g.currentStreak, g.longestStreak, g.totalActiveDays) };
-        g.level = levelForXP(g.xp);
-        const todayKey = todayISO();
-        g.weeklyXP = { ...g.weeklyXP, [todayKey]: (g.weeklyXP[todayKey] || 0) + xp };
-        const unlocked = checkAllAchievements(g);
-        if (unlocked.length) g.achievements = [...g.achievements, ...unlocked];
-        return g;
-      });
+      setGamification((prev) => awardXP(prev, 2, { totalCardsReviewed: 1 }));
     },
     dueReviews: due(reviewCards),
     savedQuizzes,
     addSavedQuiz: (result: QuizResult) => {
       setSavedQuizzes((prev) => [{ id: `quiz-${Date.now()}`, title: result.title, savedAt: Date.now(), result }, ...prev]);
       const correct = result.questions.length;
-      const xp = 5 * correct;
-      setGamification((prev) => {
-        let g = { ...prev, xp: prev.xp + xp, totalQuizzesCompleted: prev.totalQuizzesCompleted + 1, totalQuizCorrect: prev.totalQuizCorrect + correct };
-        g = { ...g, ...updateStreak(g.lastActiveDate, g.currentStreak, g.longestStreak, g.totalActiveDays) };
-        g.level = levelForXP(g.xp);
-        const todayKey = todayISO();
-        g.weeklyXP = { ...g.weeklyXP, [todayKey]: (g.weeklyXP[todayKey] || 0) + xp };
-        const unlocked = checkAllAchievements(g);
-        if (unlocked.length) g.achievements = [...g.achievements, ...unlocked];
-        return g;
-      });
+      setGamification((prev) => awardXP(prev, 5 * correct, { totalQuizzesCompleted: 1, totalQuizCorrect: correct }));
     },
     lockinActive: lockinSessions.find((s) => s.status === "active") ?? null,
     lockinHistory: lockinSessions.filter((s) => s.status !== "active"),

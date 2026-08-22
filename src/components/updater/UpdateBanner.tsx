@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Icon } from "../Icon";
-import { isDesktop } from "../browser/BrowserPage";
+import { isDesktop } from "../../lib/platform";
 import {
   ensureUpdate,
   useUpdate,

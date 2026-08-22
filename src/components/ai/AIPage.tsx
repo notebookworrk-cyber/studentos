@@ -4,6 +4,7 @@ import { useOS, uid } from "../../state/os";
 import { buildPlanPrompt, deterministicPlan } from "../../lib/aiPlanner";
 import { Icon } from "../Icon";
 import { AISetup } from "./AISetup";
+import { StudyAISection } from "./StudyAISection";
 
 const SUGGESTION_CHIPS = [
   "Explain a concept",
@@ -46,8 +47,29 @@ export function AIPage() {
   const [chatInput, setChatInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [cloudReady, setCloudReady] = useState(false);
+  const [studyOpen, setStudyOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const streamSubsRef = useRef<Array<() => void>>([]);
+  const activeRequestRef = useRef<string | null>(null);
+
+  // Fetch cloud provider status once (BYOK config lives in main process)
+  useEffect(() => {
+    window.studentos?.ai?.getCloudStatus().then((s) => setCloudReady(s.configured)).catch(() => {});
+  }, []);
+
+  // Unmount cleanup: detach subscriptions, abort any in-flight generation
+  useEffect(
+    () => () => {
+      streamSubsRef.current.forEach((unsub) => unsub());
+      streamSubsRef.current = [];
+      if (activeRequestRef.current) {
+        window.studentos?.ai?.cancelStream(activeRequestRef.current).catch(() => {});
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -59,6 +81,12 @@ export function AIPage() {
       const raw = localStorage.getItem("studentos.ai.intent.v1");
       if (raw) {
         const intent = JSON.parse(raw);
+        // Study actions (quiz/flashcards/summarize) are consumed by the
+        // StudyAISection dock on mount — only open it here.
+        if (intent?.action) {
+          setStudyOpen(true);
+          return;
+        }
         if (intent?.prompt && typeof intent.prompt === "string") {
           localStorage.removeItem("studentos.ai.intent.v1");
           sendChat(intent.prompt);
@@ -118,34 +146,54 @@ export function AIPage() {
     return id;
   };
 
-  const streamAssistant = async (assistantId: string, prompt: string) => {
+  const streamAssistant = async (assistantId: string, prompt: string, history?: { role: "user" | "assistant"; content: string }[]) => {
     const api = window.studentos?.ai;
     if (!api) return;
-    const unsubChunk = api.onStreamChunk((chunk) => {
-      setAiMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: m.content + chunk } : m));
-    });
-    const unsubDone = api.onStreamDone((_text) => {
-      setAiGenerating(false);
-      unsubChunk();
-      unsubDone();
-      unsubError();
-    });
-    const unsubError = api.onStreamError((error) => {
-      setAiMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: m.content || `Error: ${error}` } : m));
-      setAiGenerating(false);
-      unsubChunk();
-      unsubDone();
-      unsubError();
-    });
+    const requestId = uid("req");
+    activeRequestRef.current = requestId;
+    const detach = () => {
+      streamSubsRef.current.forEach((unsub) => unsub());
+      streamSubsRef.current = [];
+      if (activeRequestRef.current === requestId) activeRequestRef.current = null;
+    };
+    const append = (fn: (content: string) => string) => {
+      setAiMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: fn(m.content) } : m)));
+    };
+    streamSubsRef.current = [
+      api.onStreamChunk(({ id, chunk }) => {
+        if (id !== requestId) return;
+        append((c) => c + chunk);
+      }),
+      api.onStreamDone(({ id }) => {
+        if (id !== requestId) return;
+        detach();
+        setAiGenerating(false);
+      }),
+      api.onStreamError(({ id, error }) => {
+        if (id !== requestId) return;
+        detach();
+        append((c) => c || `Error: ${error}`);
+        setAiGenerating(false);
+      }),
+    ];
+    const messages = [...(history ?? []), { role: "user" as const, content: prompt }];
     try {
-      await api.generateStream(prompt, 0.7, 1024);
+      await api.generateStream({ requestId, prompt, messages, temperature: 0.7, maxTokens: 1024 });
     } catch (e: unknown) {
-      setAiMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: `Error: ${e instanceof Error ? e.message : e}` } : m));
+      detach();
+      append((c) => c || `Error: ${e instanceof Error ? e.message : e}`);
       setAiGenerating(false);
-      unsubChunk();
-      unsubDone();
-      unsubError();
     }
+  };
+
+  const stopGeneration = () => {
+    const id = activeRequestRef.current;
+    if (!id) return;
+    window.studentos?.ai?.cancelStream(id).catch(() => {});
+    streamSubsRef.current.forEach((unsub) => unsub());
+    streamSubsRef.current = [];
+    activeRequestRef.current = null;
+    setAiGenerating(false);
   };
 
   const sendChat = async (text?: string) => {
@@ -154,9 +202,14 @@ export function AIPage() {
     if (!window.studentos?.ai) return;
     setChatInput("");
     setAiGenerating(true);
+    // Snapshot prior turns for the cloud provider (stateless per request)
+    const history = aiMessages
+      .filter((m) => m.content.trim())
+      .slice(-12)
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
     pushMsg("user", msg);
     const assistantId = pushMsg("assistant", "");
-    await streamAssistant(assistantId, msg);
+    await streamAssistant(assistantId, msg, history);
   };
 
   const planDay = async () => {
@@ -175,7 +228,7 @@ export function AIPage() {
   };
 
   const hasAI = !!window.studentos?.ai;
-  const isModelReady = aiStatus === "ready" || aiStatus === "loaded";
+  const isModelReady = cloudReady || aiStatus === "ready" || aiStatus === "loaded";
 
   return (
     <div className="ai-page-full">
@@ -186,7 +239,13 @@ export function AIPage() {
           <span className="ai-topbar-title">StudentOS AI</span>
           {hasAI && (
             <span className={`ai-topbar-badge ${isModelReady ? "online" : "offline"}`}>
-              {aiStatus === "loading" ? "Loading..." : isModelReady ? "Online" : "Offline"}
+              {aiStatus === "loading"
+                ? "Loading..."
+                : cloudReady
+                  ? "Cloud"
+                  : isModelReady
+                    ? "Online"
+                    : "Offline"}
             </span>
           )}
           {!hasAI && (
@@ -195,6 +254,13 @@ export function AIPage() {
         </div>
         <div className="ai-topbar-right">
           {hasAI && <AISetup />}
+          <button
+            className={`btn btn-ghost btn-icon ${studyOpen ? "active" : ""}`}
+            onClick={() => setStudyOpen((s) => !s)}
+            title={studyOpen ? "Hide study tools" : "Study tools"}
+          >
+            <Icon name="book" size={16} />
+          </button>
           <button
             className="btn btn-ghost btn-icon"
             onClick={() => setSidebarOpen((s) => !s)}
@@ -205,6 +271,12 @@ export function AIPage() {
         </div>
       </div>
 
+      {studyOpen && (
+        <div className="ai-study-dock">
+          <StudyAISection />
+        </div>
+      )}
+
       <div className="ai-main-layout">
         {/* Chat Area */}
         <div className="ai-chat-area">
@@ -214,7 +286,9 @@ export function AIPage() {
                 <Icon name="ai" size={32} />
               </div>
               <h2 className="ai-welcome-title">StudentOS AI</h2>
-              <p className="ai-welcome-sub">Ask me anything. I run 100% offline on your device.</p>
+              <p className="ai-welcome-sub">
+                {cloudReady ? "Connected to your cloud model." : "Ask me anything. I run 100% offline on your device."}
+              </p>
               <div className="ai-chips">
                 {SUGGESTION_CHIPS.map((chip) => (
                   <button
@@ -295,10 +369,11 @@ export function AIPage() {
               />
               <button
                 className="ai-send-btn"
-                onClick={() => sendChat()}
-                disabled={aiGenerating || !chatInput.trim() || !isModelReady}
+                onClick={aiGenerating ? stopGeneration : () => sendChat()}
+                disabled={!aiGenerating && (!chatInput.trim() || !isModelReady)}
+                title={aiGenerating ? "Stop generating" : "Send"}
               >
-                <Icon name="arrow" size={16} />
+                <Icon name={aiGenerating ? "x" : "arrow"} size={16} />
               </button>
             </div>
             {!isModelReady && hasAI && (
@@ -371,7 +446,11 @@ export function AIPage() {
               <button
                 className="btn btn-ghost btn-sm"
                 style={{ width: "100%" }}
-                onClick={() => setAiMessages([])}
+                onClick={() => {
+                  stopGeneration();
+                  setAiMessages([]);
+                  window.studentos?.ai?.resetChat().catch(() => {});
+                }}
                 disabled={aiMessages.length === 0}
               >
                 <Icon name="trash" size={13} />

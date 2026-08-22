@@ -4,7 +4,9 @@ import { readdir, writeFile, readFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { PermissionManager } from "./permissions.js";
 import { getLocalModelManager } from "./ai/localModel.js";
-import { loadModel, unloadModel, isModelLoaded, generateText, generateStream, testModel } from "./ai/generator.js";
+import { loadModel, unloadModel, isModelLoaded, generateText, generateStream, testModel, resetChatSession } from "./ai/generator.js";
+import { generateCloudText, generateCloudStream, testCloud } from "./ai/cloud.js";
+import { cloudStatus, setCloudConfig, clearCloudConfig, isCloudConfigured } from "./ai/providerStore.js";
 
 export function registerIpc(win, browsers, terminals, { isDev }) {
   const handlers = new Map();
@@ -146,24 +148,63 @@ export function registerIpc(win, browsers, terminals, { isDev }) {
   });
   handle("ai:unloadModel", async () => { unloadModel(); return { ok: true }; });
   handle("ai:isLoaded", async () => ({ loaded: isModelLoaded() }));
-  handle("ai:generate", async ({ prompt, temperature, maxTokens }) => generateText(prompt, { temperature, maxTokens }));
-  handle("ai:generateStream", async ({ prompt, temperature, maxTokens }, e) => {
-    generateStream(prompt, {
-      temperature,
-      maxTokens,
-      onChunk(chunk) {
-        if (win && !win.isDestroyed()) win.webContents.send("ai:stream-chunk", chunk);
-      },
-      onDone(text) {
-        if (win && !win.isDestroyed()) win.webContents.send("ai:stream-done", text);
-      },
-      onError(msg) {
-        if (win && !win.isDestroyed()) win.webContents.send("ai:stream-error", msg);
-      },
-    });
-    return { ok: true }; // immediate ack; actual data via events
+
+  // Active provider routing: cloud (BYOK, OpenAI-compatible) when configured, else local model
+  const streamControllers = new Map();
+
+  handle("ai:getCloudStatus", async () => cloudStatus());
+  handle("ai:setCloudConfig", async ({ baseUrl, model, apiKey }) => setCloudConfig(baseUrl, model, apiKey));
+  handle("ai:clearCloudConfig", async () => { clearCloudConfig(); return cloudStatus(); });
+  handle("ai:testCloud", async () => testCloud());
+  handle("ai:resetChat", async () => {
+    if (!isCloudConfigured()) await resetChatSession();
+    return { ok: true };
   });
-  handle("ai:test", async () => testModel());
+
+  handle("ai:generate", async ({ prompt, temperature, maxTokens }) => {
+    if (isCloudConfigured()) {
+      return generateCloudText([{ role: "user", content: prompt }], { temperature, maxTokens });
+    }
+    return generateText(prompt, { temperature, maxTokens });
+  });
+
+  handle("ai:generateStream", async ({ requestId, prompt, messages, temperature = 0.7, maxTokens }, e) => {
+    const id = requestId;
+    const controller = new AbortController();
+    streamControllers.set(id, controller);
+    const send = (channel, extra) => {
+      if (win && !win.isDestroyed()) win.webContents.send(channel, { id, ...extra });
+    };
+    const cleanup = () => streamControllers.delete(id);
+    const opts = {
+      temperature,
+      maxTokens: maxTokens ?? 1024,
+      signal: controller.signal,
+      onChunk(chunk) { send("ai:stream-chunk", { chunk }); },
+      onDone(text) { cleanup(); send("ai:stream-done", { text }); },
+      onError(msg) { cleanup(); if (!controller.signal.aborted) send("ai:stream-error", { error: msg }); },
+    };
+    if (isCloudConfigured()) {
+      void generateCloudStream(messages ?? [{ role: "user", content: prompt }], opts);
+    } else {
+      void generateStream(prompt, opts);
+    }
+    return { ok: true, requestId: id }; // immediate ack; actual data via events
+  });
+
+  handle("ai:cancelStream", async ({ requestId }) => {
+    streamControllers.get(requestId)?.abort();
+    streamControllers.delete(requestId);
+    return { ok: true };
+  });
+
+  handle("ai:test", async () => {
+    if (isCloudConfigured()) {
+      const res = await testCloud();
+      return res.ok ? { text: res.text } : { text: "", error: res.error };
+    }
+    return testModel();
+  });
 
   browsers.win = win;
   terminals.win = win;

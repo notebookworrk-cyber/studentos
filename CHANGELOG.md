@@ -2,6 +2,26 @@
 
 All notable changes will be documented in this file.
 
+## [3.3.0] - 2026-08-23
+### Added
+- AI 2.0: bring-your-own-key cloud providers (OpenAI-compatible: OpenAI, Groq, OpenRouter, Gemini, Anthropic, Ollama, LM Studio) configured in Settings → AI Assistant; keys encrypted with DPAPI via safeStorage, never exposed to the renderer
+- Cloud + local model auto-routing for chat, plan-my-day, and all study tools; falls back to the offline local model whenever cloud is unavailable
+- LLM-backed study intelligence with heuristic fallback: smarter summaries, quizzes, flashcards, ask-your-notes, and note rewrite tools (improve/expand/suggest)
+- Study tools dock inside the AI page (book icon) — summarize/quiz/flashcards/ask work on your notes directly
+- Streaming stop button, per-request cancellation, and concurrent-chat safety (request IDs)
+### Changed
+- Local model worker now requires a per-launch auth token (localhost-only hardening)
+- Clear chat resets the local model session so replies stay in sync with visible history
+### Fixed
+- Latent off-by-one-day bugs: daily quote rotation, task-due/digest/review notifications, stats day keys, backup filenames now use the real local date
+- Chat unmount no longer leaks stream subscriptions; interrupted generations clean up after themselves
+### Removed
+- Dead provider scaffolding (electron/ai/provider.ts, modelRegistry.ts) and 3 unused cloud SDK dependencies (~smaller install)
+### Quality
+- Store refactor: usePersistedState hook replaces ~30 copy-paste persistence effects; awardXP helper replaces 5 duplicated XP blocks
+- Shared isDesktop module; UTC→local date fixes across notifications/stats/backup
+- Test suite grown from 45 to 69 tests (gamification XP/streaks/levels, date helpers, persistence contract)
+
 ## [0.1.0] - 2024-01-01
 ### Added
 - Project initialized

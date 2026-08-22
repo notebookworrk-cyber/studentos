@@ -1,3 +1,4 @@
+import { todayISO } from "./date";
 import { QUOTES, type Quote } from "../data/quotes";
 
 const CACHE_KEY = "studentos.dailyQuote.v1";
@@ -9,7 +10,7 @@ interface CachedQuote {
 }
 
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+  return todayISO();
 }
 
 function deterministicPick(date: string): Quote {

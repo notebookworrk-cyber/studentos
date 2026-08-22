@@ -1,7 +1,7 @@
 {
   "name": "studentos",
   "private": true,
-  "version": "3.2.0",
+  "version": "3.3.0",
   "type": "module",
   "author": "Lucky (notebookworrk-cyber)",
   "description": "StudentOS — an all-in-one desktop OS for students: tasks, calendar, notes, study planner, focus timer, projects, research, terminal, browser and a local AI assistant.",
@@ -64,12 +64,9 @@
     "dev:desktop": "STUDENTOS_DEV=1 ELECTRON_START_URL=http://localhost:5173 electron ."
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.116.0",
-    "@google/generative-ai": "^0.24.1",
     "electron-updater": "^6.8.9",
     "node-llama-cpp": "^3.20.0",
     "node-pty": "^1.1.0",
-    "openai": "^7.4.0",
     "pdfjs-dist": "^6.2.108",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

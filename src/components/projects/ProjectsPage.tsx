@@ -3,7 +3,7 @@ import { useOS } from "../../state/os";
 import { toast } from "../../state/toasts";
 import { fmtFullDate } from "../../lib/date";
 import { Icon } from "../Icon";
-import { isDesktop } from "../browser/BrowserPage";
+import { isDesktop } from "../../lib/platform";
 import { ContextMenu, useContextMenu } from "../ContextMenu";
 
 export function ProjectsPage() {

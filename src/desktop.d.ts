@@ -59,12 +59,18 @@ interface StudentOSDesktop {
     unloadModel: () => Promise<{ ok: boolean }>;
     isLoaded: () => Promise<{ loaded: boolean }>;
     generate: (prompt: string, temperature?: number, maxTokens?: number) => Promise<{ text: string; error?: string }>;
-    generateStream: (prompt: string, temperature?: number, maxTokens?: number) => Promise<{ ok: boolean }>;
+    getCloudStatus: () => Promise<{ configured: boolean; baseUrl: string | null; model: string | null; hasKey: boolean }>;
+    setCloudConfig: (payload: { baseUrl: string; model: string; apiKey: string }) => Promise<{ configured: boolean; baseUrl: string | null; model: string | null; hasKey: boolean }>;
+    clearCloudConfig: () => Promise<{ configured: boolean; baseUrl: string | null; model: string | null; hasKey: boolean }>;
+    testCloud: () => Promise<{ ok: boolean; text?: string; error?: string }>;
+    resetChat: () => Promise<{ ok: boolean }>;
+    generateStream: (payload: { requestId: string; prompt: string; messages?: { role: "user" | "assistant"; content: string }[]; temperature?: number; maxTokens?: number }) => Promise<{ ok: boolean; requestId: string }>;
+    cancelStream: (requestId: string) => Promise<{ ok: boolean }>;
     test: () => Promise<{ text: string; error?: string }>;
     onProgress: (cb: (data: Record<string, unknown>) => void) => () => void;
-    onStreamChunk: (cb: (chunk: string) => void) => () => void;
-    onStreamDone: (cb: (text: string) => void) => () => void;
-    onStreamError: (cb: (error: string) => void) => () => void;
+    onStreamChunk: (cb: (data: { id: string; chunk: string }) => void) => () => void;
+    onStreamDone: (cb: (data: { id: string; text: string }) => void) => () => void;
+    onStreamError: (cb: (data: { id: string; error: string }) => void) => () => void;
   };
 }
 
