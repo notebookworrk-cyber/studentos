@@ -48,7 +48,11 @@ jobs:
           $tags = git tag --sort=-v:refname
           $prev = if ($tags.Count -gt 1) { $tags[1] } else { "" }
           $notes = if ($prev) { git log "$prev..HEAD" --oneline --no-decorate } else { git log --oneline -20 --no-decorate }
-          gh release create "$env:GITHUB_REF_NAME" --repo "${{ github.repository }}" --title "StudentOS $($env:GITHUB_REF_NAME.Substring(1))" --notes ($notes -join "`n")
+          if (gh release view "$env:GITHUB_REF_NAME" --repo "${{ github.repository }}" 2>$null) {
+            Write-Host "Release $env:GITHUB_REF_NAME already exists — reusing it."
+          } else {
+            gh release create "$env:GITHUB_REF_NAME" --repo "${{ github.repository }}" --title "StudentOS $($env:GITHUB_REF_NAME.Substring(1))" --notes ($notes -join "`n")
+          }
 
       - name: Build & publish installer
         shell: pwsh

@@ -29,7 +29,8 @@
       {
         "provider": "github",
         "owner": "notebookworrk-cyber",
-        "repo": "studentos"
+        "repo": "studentos",
+        "releaseType": "release"
       }
     ],
     "win": {
